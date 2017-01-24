@@ -33,6 +33,7 @@ def create_salad(self, request):
 @app.ResourceApp.dump_json(model=model.DocumentCollection)
 def dump_json_collection(self, request):
     return {
+        '@context': 'http://schema.org',
         '@type': 'ItemList',
         '@id': request.link(self),
         'itemListElement': [{
@@ -45,6 +46,7 @@ def dump_json_collection(self, request):
 @app.ResourceApp.dump_json(model=model.Document)
 def dump_json_resource(self, request):
     return {
+        '@context': 'http://schema.org',
         '@type': self.schema_type,
         '@id': request.link(self)
     }
