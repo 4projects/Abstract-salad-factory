@@ -1,10 +1,13 @@
+from webob import static
+
 from . import app
 from . import model
 
 
-@app.App.html(model=model.Root)
+@app.App.view(model=model.Root)
 def view_root(self, request):
-    return ""
+    request.include('abstract_salad_bar')
+    return request.get_response(static.FileApp('index.html'))
 
 
 @app.ResourceApp.json(model=model.DocumentCollection)

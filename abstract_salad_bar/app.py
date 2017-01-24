@@ -1,6 +1,7 @@
 from . import model
 
 from more.transaction import TransactionApp
+from more.static import StaticApp
 import morepath
 import ZODB
 import zodburi
@@ -15,7 +16,7 @@ storage = storage_factory()
 # to make sure the transaction tween is run.
 
 
-class App(TransactionApp):
+class App(TransactionApp, StaticApp):
 
     @morepath.reify
     def db(self):
