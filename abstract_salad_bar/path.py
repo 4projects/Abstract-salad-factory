@@ -2,9 +2,9 @@ from . import app
 from . import model
 
 
-@app.App.path(model=model.Root, path='')
-def get_root_path():
-    return model.Root()
+@app.RootApp.path(model=model.Root, path='')
+def get_root_path(request):
+    return model.Root(request.app.db)
 
 
 @app.ResourceApp.path(model=model.DocumentCollection, path='')
@@ -24,7 +24,7 @@ def mount_ingredients(request, id):
         return app.IngredientsApp(salad=salad)
 
 
-@app.App.mount(path='salads', app=app.SaladsApp)
+@app.RootApp.mount(path='salads', app=app.SaladsApp)
 def mount_salads():
     return app.SaladsApp()
 
