@@ -11,19 +11,14 @@ from . import model
 #     ))
 
 
-@app.ResourceApp.json(model=model.DocumentCollection)
-def collection_json_view(self, request):
-    return self
-
-
-@app.ResourceApp.json(model=model.Document)
-def document_json_view(self, request):
+@app.ResourceApp.json(model=model.Resource)
+def view_json_resource(self, request):
     return self
 
 
 @app.ResourceApp.json(model=model.DocumentCollection, request_method='POST',
                       body_model=model.Document)
-def create_salad(self, request):
+def create_document(self, request):
     resource = self.add(request.body_obj)
     return request.view(resource)
 
