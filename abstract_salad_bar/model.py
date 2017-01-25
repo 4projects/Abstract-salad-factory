@@ -106,5 +106,8 @@ class Comment(Document):
     pass
 
 
-class Root(object):
-    pass
+class Root(Resource):
+
+    def __init__(self, db):
+        print(db)
+        self.salads = db['salads']
