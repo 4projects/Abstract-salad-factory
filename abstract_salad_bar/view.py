@@ -39,6 +39,20 @@ def dump_json_collection(self, request):
     }
 
 
+@app.RootApp.dump_json(model.Root)
+def dump_json_root(self, request):
+    return {
+        '@context': 'http://schema.org',
+        'salads': {
+            '@type': 'ItemList',
+            '@id': request.link(
+                self.salads,
+                app=request.app.child(app.SaladsApp())
+            )
+        }
+    }
+
+
 @app.ResourceApp.dump_json(model=model.Document)
 def dump_json_resource(self, request):
     return {
