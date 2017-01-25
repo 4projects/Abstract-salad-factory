@@ -42,9 +42,9 @@ class Document(persistent.Persistent, Resource):
 
     @classmethod
     def is_valid_json(cls, json):
-        if json.get('@type').lower() == cls.schema_type.lower():
-            return True
-        return False
+        if json.get('@type').lower() != cls.schema_type.lower():
+            return False
+        return True
 
 
 class Salad(Document):
@@ -64,6 +64,19 @@ class Salad(Document):
 
     schema_type = 'FoodEvent'
 
+    @classmethod
+    def is_valid_json(cls, json):
+        if not super().is_valid_json(json):
+            return False
+        date = json.get('startDate')
+        if date:
+            try:
+                # Don't like this for validation, how could I improve this?
+                arrow.get(date)
+            except RuntimeError:
+                return False
+        return True
+
 
 class Ingredient(Document):
     """A ingredient in a salad."""
@@ -79,12 +92,12 @@ class Ingredient(Document):
 
     @classmethod
     def is_valid_json(cls, json):
-        if super().is_valid_json(json):
-            for name in ('name', 'owner'):
-                if name not in json:
-                    return False
-            return True
-        return False
+        if not super().is_valid_json(json):
+            return False
+        for name in ('name', 'owner'):
+            if name not in json:
+                return False
+        return True
 
 
 class Comment(Document):
