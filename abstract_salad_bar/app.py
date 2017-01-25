@@ -16,25 +16,24 @@ storage = storage_factory()
 # to make sure the transaction tween is run.
 
 
-class App(TransactionApp, StaticApp):
+class ResourceApp(TransactionApp, StaticApp):
 
     @morepath.reify
     def db(self):
         uri = self.settings.db.uri
-        return ZODB.DB(storage, **dbkw).open()
+        db = ZODB.DB(storage, **dbkw).open()
+        db = db.root()
+        db.setdefault('salads', model.SaladCollection())
+        return db
 
 
-@App.setting(section='db', name='uri')
+@ResourceApp.setting(section='db', name='uri')
 def get_database_settings():
     return 'file://bla.fs'
 
 
-class ResourceApp(App):
-
-    @morepath.reify
-    def db(self):
-        db = super().db
-        return db.root()
+class RootApp(ResourceApp):
+    pass
 
 
 class SaladsApp(ResourceApp):
@@ -42,7 +41,7 @@ class SaladsApp(ResourceApp):
     @morepath.reify
     def db(self):
         db = super().db
-        return db.setdefault('salads', model.SaladCollection())
+        return db['salads']
 
 
 class IngredientsApp(ResourceApp):
@@ -55,3 +54,6 @@ class IngredientsApp(ResourceApp):
     @morepath.reify
     def db(self):
         return self.salad.ingredients
+
+
+App = RootApp
