@@ -1,13 +1,14 @@
-from webob import static
 
 from . import app
 from . import model
 
 
-@app.App.view(model=model.Root)
-def view_root(self, request):
-    request.include('abstract_salad_bar')
-    return request.get_response(static.FileApp('index.html'))
+# @app.App.view(model=model.Root)
+# def view_root(self, request):
+#     request.include('abstract_salad_bar')
+#     return request.get_response(static.FileApp(
+#         module_relative_path('index.html')
+#     ))
 
 
 @app.ResourceApp.json(model=model.DocumentCollection)
