@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+  <div id="main">
+  <h1>Create an Abstract Salad Bar!!!!!!!!!!!</h1>
+  <form id="createsalad" autocomplete=off action="javascript:alert( 'fail' );">
+    <div>
+    <label for="startDate">Date:</label>
+    <!-- startDate does not contain any timezone information, add it -->
+    <input type="datetime-local" name="startDate" id="startDate" value="" />
+    </div>
+    <div>
+    <label for="location">Location:</label>
+    <input type="text" name="location" id="location" value="" />
+    </div>
+    <div class="button">
+    <button type=submit>Create!</button>
+    </div>
+  </form>
+
+  </div>
+  <div id="salad" hidden>
+    <h1>Abstract Salad Bar</h1>
+    <!-- date and location -->
+    <!-- ingredients list -->
+    <ul id=ingredients>
+    </ul>
+  </div>
+</body>
+<script type="text/javascript" src="/js/asb.js"></script>
+</html>
