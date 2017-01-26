@@ -5,15 +5,16 @@
 <body>
   <div id="main">
   <h1>Create an Abstract Salad Bar!!!!!!!!!!!</h1>
-  <form id="createsalad" autocomplete=off action="javascript:alert( 'fail' );">
+  <form id="createSalad" autocomplete=off action="/api/salads">
+    <input type="hidden" name="type" value="FoodEvent" />
     <div>
     <label for="startDate">Date:</label>
     <!-- startDate does not contain any timezone information, add it -->
-    <input type="datetime-local" name="startDate" id="startDate" value="" />
+    <input type="datetime-local" name="startDate" value="" />
     </div>
     <div>
     <label for="location">Location:</label>
-    <input type="text" name="location" id="location" value="" />
+    <input type="text" name="location" value="" />
     </div>
     <div class="button">
     <button type=submit>Create!</button>
@@ -23,10 +24,29 @@
   </div>
   <div id="salad" hidden>
     <h1>Abstract Salad Bar</h1>
+    <h2 id="saladLocation"></h2>
+    <h2 id="saladDate"></h2>
     <!-- date and location -->
-    <!-- ingredients list -->
-    <ul id=ingredients>
-    </ul>
+    <!-- ingredients table -->
+    <form id="createIngredient" autocomplete=off>
+      <input type="hidden" name="type" value="Offer" />
+    </form>
+    <table id=ingredients>
+      <thead>
+        <tr>
+          <th>Ingredient</th>
+          <th>Brought By</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr>
+          <td><input form="createIngredient" type="text" name="name" value="" /></td>
+          <td><input form="createIngredient" type="text" name="seller" value="" /></td>
+          <td><button form="createIngredient" type="submit">+</button></td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </body>
 <script type="text/javascript" src="/js/asb.js"></script>
