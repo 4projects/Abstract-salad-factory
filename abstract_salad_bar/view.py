@@ -1,9 +1,9 @@
 
-from . import app
+from . import app as app_module
 from . import model
 
 
-# @app.App.view(model=model.Root)
+# @app_module.App.view(model=model.Root)
 # def view_root(self, request):
 #     request.include('abstract_salad_bar')
 #     return request.get_response(static.FileApp(
@@ -11,13 +11,14 @@ from . import model
 #     ))
 
 
-@app.ResourceApp.json(model=model.Resource)
+@app_module.ResourceApp.json(model=model.Resource)
 def view_json_resource(self, request):
     return self
 
 
-@app.ResourceApp.json(model=model.DocumentCollection, request_method='POST',
-                      body_model=model.Document)
+@app_module.ResourceApp.json(model=model.DocumentCollection,
+                             request_method='POST',
+                             body_model=model.Document)
 def create_document(self, request):
     resource = self.add(request.body_obj)
     return request.view(resource)
@@ -26,61 +27,63 @@ def create_document(self, request):
 # Load and dump json
 
 
-@app.ResourceApp.dump_json(model=model.DocumentCollection)
-def dump_json_collection(self, request):
-    return {
-        '@context': 'http://schema.org',
+@app_module.ResourceApp.dump_json(model=model.DocumentCollection)
+def dump_json_collection(app, self, request):
+    if request.params.get('full'):
+        def item_function(document):
+            return app._dump_json(document, request)
+    else:
+        def item_function(document):
+            return {
+                '@id': request.link(document),
+                '@type': document.schema_type,
+            }
+    data = {
         '@type': 'ItemList',
         '@id': request.link(self),
-        'itemListElement': [{
-            '@id': request.link(v),
-            '@type': v.schema_type,
-        } for v in self.values()],
+        'itemListElement': [item_function(v) for v in self.values()]
     }
+    data.update({'@context': 'http://schema.org'})
+    return data
 
 
-@app.RootApp.dump_json(model.Root)
-def dump_json_root(self, request):
-    return {
-        '@context': 'http://schema.org',
-        'salads': {
-            '@type': 'ItemList',
-            '@id': request.link(
-                self.salads,
-                app=request.app.child(app.SaladsApp())
-            )
-        }
+@app_module.ResourceApp.dump_json(model.Root)
+def dump_json_root(app, self, request):
+    data = {
+        'salads': dump_json_document(app.child(app_module.SaladsApp()),
+                                     self.salads,
+                                     request)
     }
+    data.update({'@context': 'http://schema.org'})
+    return data
 
 
-@app.ResourceApp.dump_json(model=model.Document)
-def dump_json_resource(self, request):
-    return {
-        '@context': 'http://schema.org',
+@app_module.ResourceApp.dump_json(model=model.Document)
+def dump_json_document(app, self, request):
+    data = {
         '@type': self.schema_type,
-        '@id': request.link(self)
+        '@id': request.link(self, app=app)
     }
+    data.update({'@context': 'http://schema.org'})
+    return data
 
 
-@app.SaladsApp.dump_json(model=model.Salad)
-def dump_json_salad(self, request):
+@app_module.ResourceApp.dump_json(model=model.Salad)
+def dump_json_salad(app, self, request):
     json = {
         'startDate': self.start_time.isoformat(),
         'location': self.location,
-        'ingredients': {
-            '@type': 'ItemList',
-            '@id': request.link(
-                self.ingredients,
-                app=request.app.child(app.IngredientsApp(self))
-            )
-        }
+        'ingredients': dump_json_document(
+            app.child(app_module.IngredientsApp(self)),
+            self.ingredients, request
+        )
     }
-    json.update(dump_json_resource(self, request))
+    json.update(dump_json_document(app, self, request))
     return json
 
 
-@app.IngredientsApp.dump_json(model=model.Ingredient)
-def dump_json_ingredient(self, request):
+@app_module.ResourceApp.dump_json(model=model.Ingredient)
+def dump_json_ingredient(app, self, request):
     json = {
         'seller': {
             '@type': 'Person',
@@ -91,11 +94,11 @@ def dump_json_ingredient(self, request):
             'name': self.name,
         }
     }
-    json.update(dump_json_resource(self, request))
+    json.update(dump_json_document(app, self, request))
     return json
 
 
-@app.SaladsApp.load_json()
+@app_module.SaladsApp.load_json()
 def load_json_salad(json, request):
     if model.Salad.is_valid_json(json):
         return model.Salad(start_time=json.get('startDate'),
@@ -103,7 +106,7 @@ def load_json_salad(json, request):
     return json
 
 
-@app.IngredientsApp.load_json()
+@app_module.IngredientsApp.load_json()
 def load_json_ingredient(json, request):
     if model.Ingredient.is_valid_json(json):
         return model.Ingredient(name=json['name'], owner=json['seller'])
