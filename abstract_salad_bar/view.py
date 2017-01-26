@@ -1,6 +1,10 @@
+import logging
 
 from . import app as app_module
 from . import model
+
+
+log = logging.getLogger(__name__)
 
 
 # @app_module.App.view(model=model.Root)
