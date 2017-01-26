@@ -1,8 +1,6 @@
 import logging
 
 import morepath
-import webob
-from webob.static import DirectoryApp
 
 from .app import App
 from .static import get_static
