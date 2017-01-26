@@ -94,7 +94,7 @@ class Ingredient(Document):
     def is_valid_json(cls, json):
         if not super().is_valid_json(json):
             return False
-        for name in ('name', 'owner'):
+        for name in ('name', 'seller'):
             if name not in json:
                 return False
         return True
