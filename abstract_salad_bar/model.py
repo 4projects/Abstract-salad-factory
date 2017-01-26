@@ -12,7 +12,8 @@ log = logging.getLogger(__name__)
 
 
 class Resource(object):
-    pass
+
+    schema_type = 'Thing'
 
 
 class DocumentCollection(BTree, Resource):
@@ -22,6 +23,8 @@ class DocumentCollection(BTree, Resource):
     def add(self, obj):
         self[obj.id] = obj
         return obj
+
+    schema_type = 'ItemList'
 
 
 class SaladCollection(DocumentCollection):
