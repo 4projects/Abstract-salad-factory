@@ -1,10 +1,14 @@
 """The abstract salad bar model."""
 import datetime
+import logging
 
 import arrow
 from BTrees.OOBTree import BTree
 import persistent
 import shortuuid
+
+
+log = logging.getLogger(__name__)
 
 
 class Resource(object):
@@ -42,7 +46,11 @@ class Document(persistent.Persistent, Resource):
 
     @classmethod
     def is_valid_json(cls, json):
-        if json.get('@type').lower() != cls.schema_type.lower():
+        log.debug('Validating abject of type [ %s ]', cls.__name__)
+        schema_type = json.get('@type', json.get('type', ''))
+        if schema_type.lower() != cls.schema_type.lower():
+            log.debug('wrong schema_type: [ %s ], expected: [ %s ]',
+                      schema_type, cls.schema_type)
             return False
         return True
 
@@ -74,6 +82,7 @@ class Salad(Document):
                 # Don't like this for validation, how could I improve this?
                 arrow.get(date)
             except RuntimeError:
+                log.debug('Could not parse date')
                 return False
         return True
 
