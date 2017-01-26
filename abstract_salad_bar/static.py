@@ -29,6 +29,7 @@ def get_static(app):
         else:
             include = components.includer(request.environ)
             include('jquery')
+            include('jquery-serialize-object')
             return static_handler(request)
 
     return app_with_static
