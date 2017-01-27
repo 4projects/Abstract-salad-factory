@@ -1,3 +1,5 @@
+"use strict";
+
 function storageAvailable(type) {
 	try {
 		var storage = window[type],

@@ -1,3 +1,5 @@
+"use strict";
+
 function loadIndex() {
     var known_locales = ["en-US", "nl"]
     var locale = window.navigator.language;

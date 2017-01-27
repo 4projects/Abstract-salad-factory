@@ -1,3 +1,5 @@
+"use strict";
+
 function postSalad(event) {
     // Create a salad and post it to the server.
     var data = $(this).serializeObject();
