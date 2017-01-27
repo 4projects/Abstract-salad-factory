@@ -192,14 +192,32 @@ function resetCreateSaladForm() {
 function getStartDate() {
     // Get the start date from the when and time input.
     var date;
-    var whenInput = $("input[name=when]").attr("value");
-    var timeInput = $("input[name=time]").attr("value");
+    var fromDay = false;
+    var whenInput = $("input[name=when]").val();
+    var timeInput = $("input[name=time]").val();
     if (whenInput) {
+        // Check for weekday. Does not work if text is put infront of weekday.
+        // works: "Thursday", "thurs"
+        // does not work: "next Thursday"
         date = moment(whenInput, "dddd");
         if (date.isValid()) {
-            date.add(7, "days")
+            fromDay = true;
         } else {
             date = moment(whenInput, ["YYYY-M-D", "L", "LL"])
+        }
+        if (!date.isValid()) {
+            // Try localized strings for "today" or "tomorrow", "next week".
+            whenInput = whenInput.trim().toLowerCase();
+            // TODO localize this part.
+            if (whenInput == "today") {
+                date = moment();
+            } else if (whenInput == "tomorrow") {
+                date = moment();
+                date.add(1, "day");
+            } else if (whenInput == "next week") {
+                date = moment();
+                date.add(7, "day");
+            }
         }
         date.hour(12).minute(30); // Set default time to 12.30.
     };
@@ -208,12 +226,20 @@ function getStartDate() {
         if (date) {
             date.hour(time.hour()).minute(time.minute());
         } else {
+            fromDay = true;
             date = time;
         }
     };
-    if (date != null & date.isValid()) {
-        // Set timezone.
-        $("input[name=startDate]").attr("value", date.format());
+    if (fromDay) {
+        // If the date was not set, or the weekday string format was used
+        // make sure that this date is in the future.
+        moment.min(date, moment()).add(7, "days");
+    };
+    if (date == null) {
+        date = moment($("input[name=startDate]").attr("value"));
+    }
+    if (date.isValid()) {
+        return date
     };
 };
 
