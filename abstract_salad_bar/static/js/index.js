@@ -11,7 +11,7 @@ window.onload = function() {
     if (known_locales.indexOf(locale) == -1) {
         locale = known_locales[0];
     };
-    var url = window.location
+    let url = window.location
     url = url.origin + "/" + locale + url.pathname + url.search + url.hash;
     window.location.replace(url);
 };

@@ -1,7 +1,7 @@
 function postSalad(event) {
     // Create a salad and post it to the server.
-    event.preventDefault();
     var data = $(this).serializeObject();
+    event.preventDefault();
     console.log(data);
     $.ajax({
         url: $(this).attr("action"),
@@ -16,7 +16,7 @@ function postSalad(event) {
 
 function getId(ApiUrl) {
     // Get the id from an Document in the api url.
-    var parser = document.createElement("a");
+    let parser = document.createElement("a");
     parser.href = ApiUrl;
     var pathname = parser.pathname;
     if (pathname.lastIndexOf("/") == (pathname.length - 1)) {
@@ -27,12 +27,12 @@ function getId(ApiUrl) {
 
 function showSalad(data) {
     // Load a salad from the data.
+    var startDate = moment.tz(data["startDate"], timezone);
     resetSalad();
     $("#main").hide();
-    var salad = $("#salad");
+    let salad = $("#salad");
     salad.data(data);
     salad.find("#saladLocation").append(data["location"]);
-    var startDate = moment.tz(data["startDate"], timezone);
     salad.find("#saladStartDate").
         append(startDate.calendar());
     salad.find("#saladStartTime").
@@ -85,8 +85,8 @@ function showIngredient(data) {
 
 function loadPage() {
     // Actions to run on page load.
-    saveEmptySalad();
     var currentState = history.state;
+    saveEmptySalad();
     if (currentState) {
         showSalad(currentState)
     } else {
@@ -129,7 +129,7 @@ function getSalad(data) {
     } else {
         url = data
     };
-    id = getId(url);
+    var id = getId(url);
     $.ajax({
         url: url,
         dataType: "json",
@@ -158,19 +158,19 @@ function showSaladLoadFail(id) {
 }
 
 function showMain() {
+    var main = $("#main");
     $("#salad").hide();
     resetSalad();
     $("#createSalad").submit(postSalad);
-    var main = $("#main");
     main.trigger("reset");
     main.show();
 }
 
 function setStartDate() {
-    startDateInput = $("input[name=startDate]");
-    var date = startDateInput.data("date");
+    var startDateInput = $("input[name=startDate]");
+    let date = startDateInput.data("date");
     if (date == null) {
-        var date = moment().tz(timezone).
+        date = moment().tz(timezone).
             day(7 + 4).
             hours(12).minutes(30).
             startOf('minute'); // Next thursday at 12.30 locale time.
