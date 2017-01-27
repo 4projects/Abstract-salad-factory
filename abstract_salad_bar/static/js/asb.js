@@ -169,32 +169,52 @@ function showMain() {
     var main = $("#main");
     $("#salad").hide();
     resetSalad();
-    $("#createSalad").submit(postSalad);
-    resetStartDate();
-    main.trigger("reset");
+    resetCreateSaladForm();
     main.show();
 }
 
-function setStartDate() {
-    var startDateInput = $("input[name=startDate]");
+function setStartDate(date) {
     $("input[name=when]").attr("value", date.calendar());
     $("input[name=time]").attr("value", date.format("LT"));
-    startDateInput.attr("value", startDateInput.data("date").format());
+    $("input[name=startDate]").attr("value", date.format());
 }
 
-function resetStartDate() {
-    var startDateInput = $("input[name=startDate]");
+function resetCreateSaladForm() {
+    $("#createSalad").submit(postSalad);
+    $("#createSalad").trigger("reset");
     var date = moment().tz(timezone).
         day(7 + 4).
         hours(12).minutes(30).
         startOf('minute'); // Next thursday at 12.30 locale time.
-    startDateInput.data("date", date);
-    setStartDate;
+    setStartDate(date);
 };
 
-function getstartDate() {
+function getStartDate() {
     // Get the start date from the when and time input.
-
+    var date;
+    var whenInput = $("input[name=when]").attr("value");
+    var timeInput = $("input[name=time]").attr("value");
+    if (whenInput) {
+        date = moment(whenInput, "dddd");
+        if (date.isValid()) {
+            date.add(7, "days")
+        } else {
+            date = moment(whenInput, ["YYYY-M-D", "L", "LL"])
+        }
+        date.hour(12).minute(30); // Set default time to 12.30.
+    };
+    if (timeInput) {
+        let time = moment(timeInput, ["HH:mm", "h:mm a"])
+        if (date) {
+            date.hour(time.hour()).minute(time.minute());
+        } else {
+            date = time;
+        }
+    };
+    if (date != null & date.isValid()) {
+        // Set timezone.
+        $("input[name=startDate]").attr("value", date.format());
+    };
 };
 
 function loadMain() {
