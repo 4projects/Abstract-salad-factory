@@ -196,9 +196,10 @@ function getStartDate() {
     // Get the start date from the when and time input.
     var date;
     var invalid = [];
+    var now = false;
     var fromDay = false;
-    var whenInput = $("input[name=when]").val();
-    var timeInput = $("input[name=time]").val();
+    var whenInput = $("input[name=when]").val().trim().toLowerCase();
+    var timeInput = $("input[name=time]").val().trim().toLowerCase();
     if (whenInput) {
         // Check for weekday. Does not work if text is put infront of weekday.
         // works: "Thursday", "thurs"
@@ -211,33 +212,41 @@ function getStartDate() {
         }
         if (!date.isValid()) {
             // Try localized strings for "today" or "tomorrow", "next week".
-            whenInput = whenInput.trim().toLowerCase();
-            // TODO localize this part.
-            if (whenInput == "today") {
+            let options = $("input[name=when]").data();
+            if (whenInput == options["today"]) {
                 date = moment();
-            } else if (whenInput == "tomorrow") {
+            } else if (whenInput == options["tomorrow"]) {
                 date = moment();
                 date.add(1, "day");
-            } else if (whenInput == "next week") {
+            } else if (whenInput == options["nextWeek"]) {
                 date = moment();
                 date.add(7, "day");
+            } else if (whenInput == options["now"]) {
+                date = moment();
+                now = true;
+            } else {
+                invalid.push("date");
             }
         }
-        if (!date.isValid()) {
-            invalid.push("date");
-        }
-        date.hour(12).minute(30); // Set default time to 12.30.
+        if (!now) {
+            date.hour(12).minute(30); // Set default time to 12.30.
+        };
     };
     if (timeInput) {
         let time = moment(timeInput, ["HH:mm", "h:mm a"])
+        if (!time.isValid()) {
+            let options = $("input[name=time]").data();
+            if (timeInput == options["same"]) {
+                time = moment();
+            } else {
+                invalid.push("time");
+            }
+        }
         if (date) {
             date.hour(time.hour()).minute(time.minute());
         } else {
             fromDay = true;
             date = time;
-        }
-        if (!time.isValid()) {
-            invalid.push("time");
         }
     };
     if (fromDay) {
@@ -248,7 +257,6 @@ function getStartDate() {
     if (date == null) {
         date = $("input[name=startDate]").data("date");
     }
-    console.log(date);
     return [date, invalid];
 };
 

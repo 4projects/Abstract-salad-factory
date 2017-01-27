@@ -12,9 +12,9 @@
     <input type="hidden" name="startDate" />
     <div>
     <label for="when">When?</label>
-    <input type="date" name="when" value="" class="saladStartDate"/>
+    <input type="date" name="when" value="" class="saladStartDate"/ data-today="today" data-now="now" data-tomorrow="tomorrow" data-nextWeek="next week">
     <label for="time">@</label>
-    <input type="time" name="time" value="" class="saladStartTime"/>
+    <input type="time" name="time" value="" class="saladStartTime" data-same="same"/>
     <span class="help-block error" hidden>Invalid <span id="inputStartDateError" hidden>date</span><span id="andError" hidden> & </span><span id="inputStartTimeError" hidden>time</span>!</span>
     <span class="help-block warning" hidden><span class="saladStartDate"></span> at <span class="saladStartTime"></span> is in the past!</span>
     <span class="help-block success" hidden>Salad starts <span class="saladStartDate"></span> at <span class="saladStartTime"></span>.</span>
