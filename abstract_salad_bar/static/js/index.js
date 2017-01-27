@@ -1,4 +1,4 @@
-window.onload = function() {
+function loadIndex() {
     var known_locales = ["en-US", "nl"]
     var locale = window.navigator.language;
     if (storageAvailable(localStorage)) {
@@ -16,3 +16,4 @@ window.onload = function() {
     window.location.replace(url);
 };
 
+window.onload = loadIndex;

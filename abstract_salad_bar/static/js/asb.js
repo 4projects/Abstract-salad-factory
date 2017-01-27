@@ -83,9 +83,15 @@ function showIngredient(data) {
     $("#ingredients tbody").append(row);
 };
 
-function loadPage() {
+function loadApp() {
     // Actions to run on page load.
     var currentState = history.state;
+    window.onpopstate = showPage;
+    timezone = moment.tz.guess();
+    // timezone = "Europe/Amsterdam";
+    moment.tz.setDefault(timezone);
+    setMomentLocaleCalendars();
+    locale = document.documentElement.lang;
     saveEmptySalad();
     if (currentState) {
         showSalad(currentState)
@@ -191,10 +197,7 @@ function loadMain() {
     showMain();
 };
 
-window.onload = loadPage;
-window.onpopstate = showPage;
-const timezone = moment.tz.guess();
-// const timezone = "Europe/Amsterdam";
-moment.tz.setDefault(timezone);
-const locale = document.documentElement.lang;
-setMomentLocaleCalendars();
+// Global variables, values are filled in the loadApp function.
+var locale;
+var timezone;
+window.onload = loadApp;
