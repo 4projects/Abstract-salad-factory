@@ -1,7 +1,11 @@
+import logging
+
 import bowerstatic
 import webob
 from webob.static import DirectoryApp
 
+
+log = logging.getLogger(__name__)
 
 bower = bowerstatic.Bower()
 
@@ -11,6 +15,8 @@ components = bower.components(
 )
 
 static = DirectoryApp('abstract_salad_bar/static')
+
+known_locales = ['en-US', 'nl']
 
 
 def get_static(app):
@@ -28,8 +34,17 @@ def get_static(app):
             return request.get_response(app)
         else:
             include = components.includer(request.environ)
-            include('jquery')
-            include('jquery-serialize-object')
+            peek = request.path_info_peek()
+            if peek in known_locales:
+                include('jquery')
+                include('jquery-serialize-object')
+                include('moment')
+                include('moment-timezone')
+                try:
+                    include('moment/locale/{}.js'.format(peek.lower()))
+                except bowerstatic.Error as e:
+                    log.debug('Failed to load moment locale file for %s: %s',
+                              peek, e)
             return static_handler(request)
 
     return app_with_static
