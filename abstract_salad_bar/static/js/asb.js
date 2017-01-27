@@ -2,9 +2,11 @@
 
 function postSalad(event) {
     // Create a salad and post it to the server.
-    var data = $(this).serializeObject();
     event.preventDefault();
-    console.log(data);
+    var data = $(this).serializeObject();
+    if (!moment(data['startDate'], moment.ISO_8601, true).isValid()) {
+        return;
+    }
     $.ajax({
         url: $(this).attr("action"),
         method: "POST",
@@ -35,10 +37,7 @@ function showSalad(data) {
     let salad = $("#salad");
     salad.data(data);
     salad.find("#saladLocation").append(data["location"]);
-    salad.find(".saladStartDate").
-        text(startDate.calendar());
-    salad.find(".saladStartTime").
-        text(startDate.format("LT"));
+    printStartDate(startDate, salad);
     salad.find("#createIngredient").submit(postIngredient(data["ingredients"]["@id"]));
     getIngredients(data);
     salad.show();
@@ -89,11 +88,12 @@ function loadApp() {
     // Actions to run on page load.
     var currentState = history.state;
     window.onpopstate = showPage;
+    locale = document.documentElement.lang;
+    moment.locale(locale);
     timezone = moment.tz.guess();
     // timezone = "Europe/Amsterdam";
     moment.tz.setDefault(timezone);
     setMomentLocaleCalendars();
-    locale = document.documentElement.lang;
     saveEmptySalad();
     if (currentState) {
         showSalad(currentState)
@@ -188,12 +188,14 @@ function resetCreateSaladForm() {
     }
     $("input[name=when]").attr("placeholder", date.calendar());
     $("input[name=time]").attr("placeholder", date.format("LT"));
-    $("input[name=startDate]").attr("value", date.format());
+    $("input[name=startDate]").data("date", date);
+    setStartDate();
 };
 
 function getStartDate() {
     // Get the start date from the when and time input.
     var date;
+    var invalid = [];
     var fromDay = false;
     var whenInput = $("input[name=when]").val();
     var timeInput = $("input[name=time]").val();
@@ -221,6 +223,9 @@ function getStartDate() {
                 date.add(7, "day");
             }
         }
+        if (!date.isValid()) {
+            invalid.push("date");
+        }
         date.hour(12).minute(30); // Set default time to 12.30.
     };
     if (timeInput) {
@@ -231,6 +236,9 @@ function getStartDate() {
             fromDay = true;
             date = time;
         }
+        if (!time.isValid()) {
+            invalid.push("time");
+        }
     };
     if (fromDay) {
         // If the date was not set, or the weekday string format was used
@@ -238,41 +246,50 @@ function getStartDate() {
         moment.min(date, moment()).add(7, "days");
     };
     if (date == null) {
-        date = moment($("input[name=startDate]").attr("value"));
+        date = $("input[name=startDate]").data("date");
     }
-    if (date.isValid()) {
-        return date
-    };
+    console.log(date);
+    return [date, invalid];
 };
 
 function setStartDate(event) {
-    var date = getStartDate();
-    var input = $(event.target);
-    let input.sibings(".help-block").hide()
-    console.log(input);
-    if (!date) {
-        let errorBlock = input.siblings(".help-block .error");
-        let dateSpan = helpBlock.find("#inputStartDateError");
-        let timeSpan = helpBlock.find("#inputStartTimeError");
-        let andSpan = helpBlock.find("#andError");
-        if (input.attr("name") == "when") {
-            dateSpan.show();
-        } else {
-            timeSpan.show();
-        }
-        if (dateSpan.is(":visible") & timeSpan.is(":visible")) {
-            andSpan.show();
-        } else {
-            andSpan.hide();
-        };
-    } else if (date < moment()) {
-        // Set class to onError, show warning message
+    var [date, invalid] = getStartDate();
+    if (event == null) {
+        var parentDiv = $("#createSalad input[name=when]").parent();
     } else {
-        // Set class to onSuccess Show success message update startDate input.
-        input.siblings(".help-block .error").children("span").hide();
-        $("input[name=startDate]").val(date);
+        var parentDiv = $(event.target).parent();
     }
+    parentDiv.find(".help-block").hide()
+    if (invalid.length) {
+        var helpBlock = parentDiv.find(".help-block.error");
+        let timeError = invalid.indexOf("time") > -1;
+        let dateError = invalid.indexOf("date") > -1;
+        parentDiv.find("input[name=when]").toggleClass("error", dateError)
+        parentDiv.find("input[name=time]").toggleClass("error", timeError)
+        helpBlock.find("#inputStartDateError").toggle(dateError);
+        helpBlock.find("#inputStartTimeError").toggle(timeError);
+        helpBlock.find("#andError").toggle(invalid.length > 1);
+        helpBlock.show();
+    } else {
+        if (date < moment()) {
+            var helpBlock = parentDiv.find(".help-block.warning");
+        } else {
+            var helpBlock = parentDiv.find(".help-block.success");
+        }
+        parentDiv.find("input").removeClass("error");
+        printStartDate(date, helpBlock);
+        helpBlock.show();
+    }
+    $("input[name=startDate]").val(date.format());
 };
+
+function printStartDate(date, block) {
+    if (block == null) {
+        block = $(window);
+    }
+    block.find(".saladStartDate").text(date.calendar());
+    block.find(".saladStartTime").text(date.format("LT"));
+}
 
 function loadMain() {
     history.pushState(null, document.title, window.location.pathname);
