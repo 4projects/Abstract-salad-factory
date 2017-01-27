@@ -25,16 +25,18 @@ function setMomentLocaleCalendars() {
 				sameElse: 'dddd, ll'
 			}
 		});
-
-		moment.updateLocale('nl', {
-			calendar: {
-				lastDay: '[gisteren]',
-				sameDay: '[vandaag]',
-				nextDay: '[morgen]',
-				lastWeek: '[afgelopen] dddd',
-				nextWeek: 'dddd',
-				sameElse: 'dddd ll'
-			}
-		});
+		// Only update the locale if it has been loaded.
+		if (moment.locales().indexOf("nl") > -1) {
+			moment.updateLocale('nl', {
+				calendar: {
+					lastDay: '[gisteren]',
+					sameDay: '[vandaag]',
+					nextDay: '[morgen]',
+					lastWeek: '[afgelopen] dddd',
+					nextWeek: 'dddd',
+					sameElse: 'dddd ll'
+				}
+			});
+		}
 	};
 };
