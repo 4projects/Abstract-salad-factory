@@ -12,13 +12,17 @@
     <input type="hidden" name="startDate" />
     <div>
     <label for="when">When?</label>
-    <input type="date" name="when" value="" />
+    <input type="date" name="when" value="" class="saladStartDate"/>
     <label for="time">@</label>
-    <input type="time" name="time" value="" />
+    <input type="time" name="time" value="" class="saladStartTime"/>
+    <span class="help-block error" hidden>Invalid <span id="inputStartDateError" hidden>date</span><span id="andError" hidden> & </span><span id="inputStartTimeError" hidden>time</span>!</span>
+    <span class="help-block warning" hidden>Salad start date <span class="saladStartDate"></span> at <span class="saladStartTime"></span> is in the past!</span>
+    <span class="help-block success" hidden>Salad start date <span class="saladStartDate"></span> at <span class="saladStartTime"></span>.</span>
     </div>
     <div>
     <label for="location">Where?</label>
     <input type="text" name="location" value="" />
+    <span class="help-block error">Invalid location.</span>
     </div>
     <div class="button">
     <button type=submit>Create!</button>
@@ -28,7 +32,7 @@
   <div id="salad" hidden>
     <h1>Abstract Salad Bar</h1>
     <h2 id="saladLocation"></h2>
-    <h2>Starts <span id="saladStartDate"></span> at <span id="saladStartTime"></span>.</h2>
+    <h2>Starts <span class="saladStartDate"></span> at <span class="saladStartTime"></span>.</h2>
     <!-- date and location -->
     <!-- ingredients table -->
     <div  id=ingredients>
@@ -39,15 +43,17 @@
     <table>
       <thead>
         <tr>
-          <th>What?</th>
-          <th>Who?</th>
+          <th><label form="createIngredient" for="name">What?</label></th>
+          <th><label form="createIngredient" for="seller">Who?</label></th>
           <th></th>
         </tr>
       </thead>
       <tbody>
       <tr>
-          <td><input form="createIngredient" type="text" name="name" value="" /></td>
-          <td><input form="createIngredient" type="text" name="seller" value="" /></td>
+          <td><input form="createIngredient" type="text" name="name" value="" />
+          <span class="help-block"></span></td>
+          <td><input form="createIngredient" type="text" name="seller" value="" />
+          <span class="help-block"></span></td>
           <td><button form="createIngredient" type="submit">+</button></td>
       </tr>
       </tbody>

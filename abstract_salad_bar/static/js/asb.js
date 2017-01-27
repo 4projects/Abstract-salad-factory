@@ -35,10 +35,10 @@ function showSalad(data) {
     let salad = $("#salad");
     salad.data(data);
     salad.find("#saladLocation").append(data["location"]);
-    salad.find("#saladStartDate").
-        append(startDate.calendar());
-    salad.find("#saladStartTime").
-        append(startDate.format("LT"));
+    salad.find(".saladStartDate").
+        text(startDate.calendar());
+    salad.find(".saladStartTime").
+        text(startDate.format("LT"));
     salad.find("#createIngredient").submit(postIngredient(data["ingredients"]["@id"]));
     getIngredients(data);
     salad.show();
@@ -173,20 +173,22 @@ function showMain() {
     main.show();
 }
 
-function setStartDate(date) {
-    $("input[name=when]").attr("value", date.calendar());
-    $("input[name=time]").attr("value", date.format("LT"));
-    $("input[name=startDate]").attr("value", date.format());
-}
-
 function resetCreateSaladForm() {
-    $("#createSalad").submit(postSalad);
+    $("#createSalad .help-block").hide();
     $("#createSalad").trigger("reset");
+    $("#createSalad").submit(postSalad);
+    $("input[name=when]").change(setStartDate)
+    $("input[name=time]").change(setStartDate)
     var date = moment().tz(timezone).
-        day(7 + 4).
+        day(4).
         hours(12).minutes(30).
-        startOf('minute'); // Next thursday at 12.30 locale time.
-    setStartDate(date);
+        startOf('minute'); // Thursday at 12.30 locale time.
+    if (date < moment()) {
+        date.add(7, "day"); // Make sure it is the next Thursday and not the last.
+    }
+    $("input[name=when]").attr("placeholder", date.calendar());
+    $("input[name=time]").attr("placeholder", date.format("LT"));
+    $("input[name=startDate]").attr("value", date.format());
 };
 
 function getStartDate() {
@@ -241,6 +243,35 @@ function getStartDate() {
     if (date.isValid()) {
         return date
     };
+};
+
+function setStartDate(event) {
+    var date = getStartDate();
+    var input = $(event.target);
+    let input.sibings(".help-block").hide()
+    console.log(input);
+    if (!date) {
+        let errorBlock = input.siblings(".help-block .error");
+        let dateSpan = helpBlock.find("#inputStartDateError");
+        let timeSpan = helpBlock.find("#inputStartTimeError");
+        let andSpan = helpBlock.find("#andError");
+        if (input.attr("name") == "when") {
+            dateSpan.show();
+        } else {
+            timeSpan.show();
+        }
+        if (dateSpan.is(":visible") & timeSpan.is(":visible")) {
+            andSpan.show();
+        } else {
+            andSpan.hide();
+        };
+    } else if (date < moment()) {
+        // Set class to onError, show warning message
+    } else {
+        // Set class to onSuccess Show success message update startDate input.
+        input.siblings(".help-block .error").children("span").hide();
+        $("input[name=startDate]").val(date);
+    }
 };
 
 function loadMain() {
