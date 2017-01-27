@@ -170,24 +170,27 @@ function showMain() {
     $("#salad").hide();
     resetSalad();
     $("#createSalad").submit(postSalad);
+    resetStartDate();
     main.trigger("reset");
     main.show();
 }
 
 function setStartDate() {
     var startDateInput = $("input[name=startDate]");
-    let date = startDateInput.data("date");
-    if (date == null) {
-        date = moment().tz(timezone).
-            day(7 + 4).
-            hours(12).minutes(30).
-            startOf('minute'); // Next thursday at 12.30 locale time.
-        startDateInput.data("date", date);
-    };
     $("input[name=when]").attr("value", date.calendar());
     $("input[name=time]").attr("value", date.format("LT"));
-    $("input[name=startDate]").attr("value", date.format());
+    startDateInput.attr("value", startDateInput.data("date").format());
 }
+
+function resetStartDate() {
+    var startDateInput = $("input[name=startDate]");
+    var date = moment().tz(timezone).
+        day(7 + 4).
+        hours(12).minutes(30).
+        startOf('minute'); // Next thursday at 12.30 locale time.
+    startDateInput.data("date", date);
+    setStartDate;
+};
 
 function getstartDate() {
     // Get the start date from the when and time input.
