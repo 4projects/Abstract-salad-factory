@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <title>ASB</title>
+</head>
+<body>
+  <div id="main" hidden>
+  <h1>Maak een nieuwe Abstract Salade Bar!!!!!!!!!!!</h1>
+  <form id="createSalad" autocomplete=off action="/api/salads">
+    <input type="hidden" name="type" value="FoodEvent" />
+    <div>
+    <label for="startDate">Date:</label>
+    <input type="date" name="startDate" value="" />
+    <label for="startTime">Time:</label>
+    <input type="time" name="startTime" value="12:30" />
+    </div>
+    <div>
+    <label for="location">Location:</label>
+    <input type="text" name="location" value="" />
+    </div>
+    <div class="button">
+    <button type=submit>Create!</button>
+    </div>
+  </form>
+  </div>
+  <div id="salad" hidden>
+    <h1>Abstract Salad Bar</h1>
+    <h2 id="saladLocation"></h2>
+    <h2 id="saladDate">Starts in <span class="relativeDate"></span>. <small></small></h2>
+    <!-- date and location -->
+    <!-- ingredients table -->
+    <form id="createIngredient" autocomplete=off>
+      <input type="hidden" name="type" value="Offer" />
+    </form>
+    <table id=ingredients>
+      <thead>
+        <tr>
+          <th>Ingredient</th>
+          <th>Brought By</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr>
+          <td><input form="createIngredient" type="text" name="name" value="" /></td>
+          <td><input form="createIngredient" type="text" name="seller" value="" /></td>
+          <td><button form="createIngredient" type="submit">+</button></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+<script type="text/javascript" src="/js/asb.js"></script>
+</html>

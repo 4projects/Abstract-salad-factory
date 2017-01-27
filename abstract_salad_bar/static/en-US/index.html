@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <title>ASB</title>
+</head>
+<body>
+  <div id="main" hidden>
+  <h1>Create an Abstract Salad Bar!!!!!!!!!!!</h1>
+  <form id="createSalad" autocomplete=off action="/api/salads">
+    <input type="hidden" name="type" value="FoodEvent" />
+    <input type="hidden" name="startDate" />
+    <div>
+    <label for="when">When?</label>
+    <input type="date" name="when" value="" />
+    <label for="time">@</label>
+    <input type="time" name="time" value="" />
+    </div>
+    <div>
+    <label for="location">Where?</label>
+    <input type="text" name="location" value="" />
+    </div>
+    <div class="button">
+    <button type=submit>Create!</button>
+    </div>
+  </form>
+  </div>
+  <div id="salad" hidden>
+    <h1>Abstract Salad Bar</h1>
+    <h2 id="saladLocation"></h2>
+    <h2>Starts <span id="saladStartDate"></span> at <span id="saladStartTime"></span>.</h2>
+    <!-- date and location -->
+    <!-- ingredients table -->
+    <div  id=ingredients>
+    <h3>Ingredients</h3>
+    <form id="createIngredient" autocomplete=off>
+      <input type="hidden" name="type" value="Offer" />
+    </form>
+    <table>
+      <thead>
+        <tr>
+          <th>What?</th>
+          <th>Who?</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr>
+          <td><input form="createIngredient" type="text" name="name" value="" /></td>
+          <td><input form="createIngredient" type="text" name="seller" value="" /></td>
+          <td><button form="createIngredient" type="submit">+</button></td>
+      </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</body>
+<!-- TODO move scripts to a bower component, and only set the onload event here. -->
+<script type="text/javascript" src="/js/util.js"></script>
+<script type="text/javascript" src="/js/asb.js"></script>
+</html>
