@@ -181,8 +181,10 @@ function setStartDate() {
     $("input[name=startDate]").attr("value", date.format());
 }
 
-funcion getstartDate() {
-}
+function getstartDate() {
+    // Get the start date from the when and time input.
+
+};
 
 function loadMain() {
     history.pushState(null, document.title, window.location.pathname);
