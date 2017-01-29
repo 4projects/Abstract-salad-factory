@@ -3,6 +3,7 @@ from io import BytesIO
 import logging
 import os
 import re
+import time
 
 from babel.messages.mofile import write_mo
 from babel.messages.pofile import read_po
@@ -18,12 +19,26 @@ NAME_RE = r"[a-zA-Z][-a-zA-Z0-9_]*"
 _interp_regex = re.compile(r'(?<!\$)(\$(?:({n})|{{({n})}}))'.format(n=NAME_RE))
 
 
+def get_languages_from_locale(locale):
+    """The languages this locale supports.
+
+    From least to most specific.
+    """
+    languages = []
+    if locale:
+        if '_' in locale:
+            languages.append(locale.split('_')[0])
+        languages.append(locale)
+    return tuple(languages)
+
+
+# TODO allow for static localized files.
 class LocaleApp(DirectoryApp):
 
     _initialized = False
     locales = {}
     templatedir = localedir = tempdir = use_fuzzy = _kw = None
-    known_locales = {'en', 'en_US'}
+    known_locales = {'en_US': get_languages_from_locale('en_US')}
 
     @classmethod
     def initialize(cls, templatedir, localedir, tempdir,
@@ -37,12 +52,12 @@ class LocaleApp(DirectoryApp):
             cls._initialized = True
             for entry in os.scandir(cls.localedir):
                 if entry.is_dir():
-                    cls.known_locales.add(entry.name)
-                    if '_' in entry.name:
-                        cls.known_locales.add(entry.name.split('_')[0])
+                    cls.known_locales[entry.name] = \
+                        get_languages_from_locale(entry.name)
 
     @classmethod
     def get_app(cls, locale):
+        locale = locale or ''
         locale = locale.replace('-', '_')
         log.debug('Getting locale for %s', locale)
         if locale not in cls.locales:
@@ -57,23 +72,17 @@ class LocaleApp(DirectoryApp):
             raise RuntimeError('Must Initialize LocaleApp before '
                                'creating an intance.')
         self.locale = locale
-        self.outdir = os.path.join(self._tempdir, locale)
-        os.mkdir(self.outdir, mode=0o700)
+        self.outdir = os.path.join(self._tempdir, self.locale)
         self._mtime = {}
         self._pofiles = {}
-        # The languages this locale supports, from least to most specific.
-        self.languages = []
-        if '_' in locale:
-            self.languages.append(locale.split('_')[0])
-        self.languages.append(locale)
+        self.languages = get_languages_from_locale(self.locale)
+        if self.locale:
+            os.mkdir(self.outdir, mode=0o700)
+            self.templatedir = os.path.join(self.templatedir, '_locale')
         super().__init__(self.templatedir, **self._kw)
 
     def is_dirty(self, path):
-        current_mtime = os.stat(path).st_mtime
-        for pofile in self.get_pofiles(path):
-            po_mtime = os.stat(pofile).st_mtime
-            if po_mtime > current_mtime:
-                current_mtime = po_mtime
+        current_mtime = self.get_real_mtime(path)
         mtime = self._mtime.get(path, 0)
         log.debug('Current mtime %s, original mtime %s.', current_mtime,
                   mtime)
@@ -81,6 +90,22 @@ class LocaleApp(DirectoryApp):
             self._mtime[path] = current_mtime
             return True
         return False
+
+    def get_real_mtime(self, path):
+        mtime = os.path.getmtime(path)
+        log.debug('File "%s" mtime: %s', path, mtime)
+        for pofile in self.get_pofiles(path):
+            mtime = max(mtime, os.path.getmtime(pofile))
+        return mtime
+
+    def bust_cache(self, bust_time=None):
+        if bust_time is None:
+            bust_time = time.time()
+        utime = (bust_time, bust_time)
+        log.debug('Busting cache, bust time: %s', bust_time)
+        for path in self._mtime:
+            if os.path.getmtime(path) < bust_time:
+                os.utime(path, utime)
 
     def make_fileapp(self, path):
         log.debug('Getting path: %s for locale %s', path, self.locale)
@@ -94,6 +119,8 @@ class LocaleApp(DirectoryApp):
 
         We get the file in order of least to most specific.
         """
+        if not self.locale:
+            return []
         if path not in self._pofiles:
             log.debug('Finding .po files for path %s and locale %s',
                       path, self.locale)
@@ -142,4 +169,7 @@ class LocaleApp(DirectoryApp):
         with open(self.get_outpath(path), 'w') as outpath:
                 template = chameleon.PageTemplateFile(path,
                                                       translate=translate)
-                outpath.write(template())
+                outpath.write(template.render(
+                    locale=self.locale,
+                    known_locales=self.known_locales
+                ))

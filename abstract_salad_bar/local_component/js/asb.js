@@ -89,6 +89,7 @@ function loadApp() {
     var currentState = history.state;
     window.onpopstate = showPage;
     locale = document.documentElement.lang;
+    // TODO set the current locale in the local storage.
     moment.locale(locale);
     timezone = moment.tz.guess();
     // timezone = "Europe/Amsterdam";
@@ -307,4 +308,3 @@ function loadMain() {
 // Global variables, values are filled in the loadApp function.
 var locale;
 var timezone;
-window.onload = loadApp;

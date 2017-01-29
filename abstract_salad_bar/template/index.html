@@ -1,64 +1,18 @@
 <!DOCTYPE html>
-<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml" xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:source="en" i18n:domain="asb">
+<html>
 <head>
   <meta charset="utf-8">
-  <title>ASB</title>
+  <title>ASB Landing Page</title>
 </head>
 <body>
-  <div id="main" hidden>
-  <h1 i18n:translate="" i18n:comment="hello">Create an Abstract Salad Bar!!!!!!!!!!!</h1>
-  <form id="createSalad" autocomplete=off action="/api/salads">
-    <input type="hidden" name="type" value="FoodEvent" />
-    <input type="hidden" name="startDate" />
-    <div>
-      <label for="when"  i18n:translate="">When?</label>
-    <input type="date" name="when" value="" class="saladStartDate" data-today="today" data-now="now" data-tomorrow="tomorrow" data-nextWeek="next week"/>
-    <label for="at" i18n:translate="">at</label>
-      <input type="time" name="at" value="" class="saladStartTime" data-same="same"/>
-    <span class="help-block error" hidden i18n:translate="">Invalid <span id="inputStartDateError" hidden i18n:name="date">date</span><span id="andError" hidden i18n:name="and"> & </span><span id="inputStartTimeError" hidden i18n:name="time">time</span>!</span>
-    <span class="help-block warning" hidden i18n:translate=""><span class="saladStartDate" i18n:name="date"></span> at <span class="saladStartTime" i18n:name="time"></span> is in the past!</span>
-    <span class="help-block success" hidden i18n:translate="">Salad starts <span class="saladStartDate" i18n:name="date"></span> at <span class="saladStartTime" i18n:name="time"></span>.</span>
-    </div>
-    <div>
-    <label for="location" i18n:translate="">Where?</label>
-    <input type="text" name="location" value="" />
-    </div>
-    <div>
-    <button type=submit i18n:translate="">Create!</button>
-    </div>
-  </form>
-  </div>
-  <div id="salad" hidden>
-    <h1 i18n:translate="">Abstract Salad Bar</h1>
-    <h2 id="saladLocation" i18n:translate=""></h2>
-    <h2 i18n:translate="">Starts <span class="saladStartDate" i18n:name="date"></span> at <span class="saladStartTime" i18n:name="time"></span>.</h2>
-    <div  id=ingredients>
-    <h3 i18n:translate="">Ingredients</h3>
-    <form id="createIngredient" autocomplete=off>
-      <input type="hidden" name="type" value="Offer" />
-    </form>
-    <table>
-      <thead>
-        <tr>
-          <th><label form="createIngredient" for="name" i18n:translate="">What?</label></th>
-          <th><label form="createIngredient" for="seller" i18n:translate="">Who?</label></th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-      <tr>
-          <td><input form="createIngredient" type="text" name="name" value="" />
-          <span class="help-block"></span></td>
-          <td><input form="createIngredient" type="text" name="seller" value="" />
-          <span class="help-block"></span></td>
-          <td><button form="createIngredient" type="submit" i18n:translate="">+</button></td>
-      </tr>
-      </tbody>
-    </table>
-    </div>
+  <div hidden>
+  <!-- TODO add langauge chooser -->
+  Please Choose a language:
+  <ul id=languages tal:repeat="known_locale known_locales">
+    <li tal:content="known_locale.replace('_', '-')"></li>
+  </ul>
   </div>
 </body>
-<!-- TODO move scripts to a bower component, and only set the onload event here. -->
-<script type="text/javascript" src="/js/util.js"></script>
-<script type="text/javascript" src="/js/asb.js"></script>
+<script type="text/javascript">window.onload = loadIndex</script>
+<script type="text/javascript" tal:define="json_dump import: json.dumps" tal:content="string: var known_locales = ${json_dump(known_locales)}">var known_locales = {}</script>
 </html>

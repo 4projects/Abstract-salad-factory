@@ -1,0 +1,26 @@
+{
+  "name": "asb",
+  "authors": [
+    "inytar <pietpiet@fastmail.net>"
+  ],
+  "description": "",
+  "main": "",
+  "version": 0.1,
+  "license": "AGPL",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "abstract_salad_bar/bower_components/",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "font-awesome": "fontawesome#^4.7.0",
+    "jquery": "^3.1.1",
+    "moment-timezone": "^0.5.11",
+    "jquery-serialize-object": "^2.5.0"
+  }
+}
