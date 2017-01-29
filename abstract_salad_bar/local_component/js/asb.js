@@ -4,9 +4,6 @@ function postSalad(event) {
     // Create a salad and post it to the server.
     event.preventDefault();
     var data = $(this).serializeObject();
-    if (!moment(data['startDate'], moment.ISO_8601, true).isValid()) {
-        return;
-    }
     $.ajax({
         url: $(this).attr("action"),
         method: "POST",
@@ -47,7 +44,7 @@ function postIngredient(url) {
     return function(event) {
         event.preventDefault();
         var data = $(this).serializeObject();
-        // We should only call the ajax if both values are filled.
+        console.log(data);
         // Empty the form.
         this.reset();
         $.ajax({
@@ -212,21 +209,20 @@ function getStartDate() {
             date = moment(whenInput, ["YYYY-M-D", "L", "LL"])
         }
         if (!date.isValid()) {
-            // Try localized strings for "today" or "tomorrow", "next week".
-            let options = $("input[name=when]").data();
-            if (whenInput == options["today"]) {
+            let options = $("input[name=when]").siblings("datalist");
+            if (whenInput == options.children("#today").text().trim().toLowerCase()) {
                 date = moment();
-            } else if (whenInput == options["tomorrow"]) {
+            } else if (whenInput == options.children("#tomorrow").text().trim().toLowerCase()) {
                 date = moment();
                 date.add(1, "day");
-            } else if (whenInput == options["nextWeek"]) {
+            } else if (whenInput == options.children("#nextWeek").text().trim().toLowerCase()) {
                 date = moment();
                 date.add(7, "day");
-            } else if (whenInput == options["now"]) {
+            } else if (whenInput == options.children("#now").text().trim().toLowerCase()) {
                 date = moment();
                 now = true;
             } else {
-                invalid.push("date");
+                invalid.push("when");
             }
         }
         if (!now) {
@@ -236,11 +232,11 @@ function getStartDate() {
     if (timeInput) {
         let time = moment(timeInput, ["HH:mm", "h:mm a"])
         if (!time.isValid()) {
-            let options = $("input[name=at]").data();
-            if (timeInput == options["same"]) {
+            let options = $("input[name=at]").siblings("datalist");
+            if (timeInput ==  options.children("#same").text().trim().toLowerCase()) {
                 time = moment();
             } else {
-                invalid.push("time");
+                invalid.push("at");
             }
         }
         if (date) {
@@ -264,28 +260,27 @@ function getStartDate() {
 function setStartDate(event) {
     var [date, invalid] = getStartDate();
     if (event == null) {
-        var parentDiv = $("#createSalad input[name=when]").parent();
+        var parentDiv = $("#createSalad input[name=when]").parents("div").first();
     } else {
-        var parentDiv = $(event.target).parent();
+        var parentDiv = $(event.target).parents("div").first();
     }
+    // Hide all help blocks.
     parentDiv.find(".help-block").hide()
-    if (invalid.length) {
-        var helpBlock = parentDiv.find(".help-block.error");
-        let timeError = invalid.indexOf("time") > -1;
-        let dateError = invalid.indexOf("date") > -1;
-        parentDiv.find("input[name=when]").toggleClass("error", dateError)
-        parentDiv.find("input[name=at]").toggleClass("error", timeError)
-        helpBlock.find("#inputStartDateError").toggle(dateError);
-        helpBlock.find("#inputStartTimeError").toggle(timeError);
-        helpBlock.find("#andError").toggle(invalid.length > 1);
-        helpBlock.show();
-    } else {
+    for (let error of ["at", "when"]) {
+        let input = parentDiv.find("input[name=" + error + "]");
+        console.log(input[0]);
+        if (invalid.indexOf(error) > -1) {
+            input[0].setCustomValidity(input.attr("errormessage"));
+        } else {
+            input[0].setCustomValidity("");
+        }
+    }
+    if (!invalid.length) {
         if (date < moment()) {
             var helpBlock = parentDiv.find(".help-block.warning");
         } else {
             var helpBlock = parentDiv.find(".help-block.success");
         }
-        parentDiv.find("input").removeClass("error");
         printStartDate(date, helpBlock);
         helpBlock.show();
     }

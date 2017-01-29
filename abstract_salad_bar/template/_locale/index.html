@@ -11,11 +11,21 @@
     <input type="hidden" name="type" value="FoodEvent" />
     <input type="hidden" name="startDate" />
     <div>
-      <label for="when"  i18n:translate="">When?</label>
-    <input type="date" name="when" value="" class="saladStartDate" data-today="today" data-now="now" data-tomorrow="tomorrow" data-nextWeek="next week"/>
-    <label for="at" i18n:translate="">at</label>
-      <input type="time" name="at" value="" class="saladStartTime" data-same="same"/>
-    <span class="help-block error" hidden i18n:translate="">Invalid <span id="inputStartDateError" hidden i18n:name="date">date</span><span id="andError" hidden i18n:name="and"> & </span><span id="inputStartTimeError" hidden i18n:name="time">time</span>!</span>
+      <label for="when"><span i18n:translate="">When?</span>
+        <input type="date" name="when" value="" class="saladStartDate" i18n:attributes="errormessage" list="dates" errormessage="Invalid date."/>
+        <datalist id="dates">
+          <option id="today" i18n:translate="">Today</option>
+          <option id="tomorrow" i18n:translate="">Tomorrow</option>
+          <option id="nextWeek" i18n:translate="">next Week</option>
+          <option id="now" i18n:translate="">Now</option>
+        </datalist>
+      </label>
+      <label for="at"><span i18n:translate="">at</span>
+      <input type="time" name="at" value="" class="saladStartTime" list="times" i18n:attributes="errormessage" errormessage="Invalid time."/>
+        <datalist id="times">
+          <option id="same" i18n:translate="">Same time</option>
+        </datalist>
+      </label>
     <span class="help-block warning" hidden i18n:translate=""><span class="saladStartDate" i18n:name="date"></span> at <span class="saladStartTime" i18n:name="time"></span> is in the past!</span>
     <span class="help-block success" hidden i18n:translate="">Salad starts <span class="saladStartDate" i18n:name="date"></span> at <span class="saladStartTime" i18n:name="time"></span>.</span>
     </div>
@@ -47,9 +57,9 @@
       </thead>
       <tbody>
       <tr>
-          <td><input form="createIngredient" type="text" name="name" value="" />
+          <td><input form="createIngredient" type="text" name="name" value="" required/>
           <span class="help-block"></span></td>
-          <td><input form="createIngredient" type="text" name="seller" value="" />
+          <td><input form="createIngredient" type="text" name="seller" value="" required/>
           <span class="help-block"></span></td>
           <td><button form="createIngredient" type="submit" i18n:translate="">+</button></td>
       </tr>
