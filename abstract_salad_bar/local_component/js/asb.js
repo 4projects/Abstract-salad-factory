@@ -11,7 +11,7 @@ function postSalad(event) {
         dataType: "json",
         contentType: "application/json; charset=utf-8",
         success: loadSalad,
-        error: showSaladLoadFail(null)
+        error: SaladLoadFail(null)
     });
 };
 
@@ -29,6 +29,8 @@ function getId(ApiUrl) {
 function showSalad(data) {
     // Load a salad from the data.
     var startDate = moment.tz(data["startDate"], timezone);
+    var id = getId(data["@id"]);
+    history.replaceState(data, data["location"], "#" + id);
     resetSalad();
     $("#main").hide();
     let salad = $("#salad");
@@ -94,7 +96,7 @@ function loadApp() {
     setMomentLocaleCalendars();
     saveEmptySalad();
     if (currentState) {
-        showSalad(currentState)
+        getSalad(currentState)
     } else {
         loadHash();
     };
@@ -102,7 +104,7 @@ function loadApp() {
 
 function showPage(event) {
     if (event.state) {
-        showSalad(event.state)
+        getSalad(event.state)
     } else {
         showMain();
     };
@@ -119,6 +121,7 @@ function resetSalad() {
 function loadHash() {
     // Load a salad from the url hash.
     var hash = window.location.hash;
+    var url;
     if (hash) {
         hash = hash.slice(1);
         url = $("#createSalad").attr("action") + "/" + hash
@@ -139,18 +142,19 @@ function getSalad(data) {
     $.ajax({
         url: url,
         dataType: "json",
-        success: loadSalad,
-        error: showSaladLoadFail(id),
+        success: showSalad,
+        error: SaladLoadFail(id),
     });
 };
 
 function loadSalad(data) {
-    var id = getId(data["@id"]);
-    history.pushState(data, data["location"], "#" + id);
+    var url = data["@id"]
+    var id = getId(url);
+    history.pushState(data, null, "#" + id);
     showSalad(data);
 };
 
-function showSaladLoadFail(id) {
+function SaladLoadFail(id) {
     var message;
     if (id) {
         message = "Failed to load salad with id: [ " + id + " ].";
@@ -159,12 +163,13 @@ function showSaladLoadFail(id) {
     }
     return function(jqXHR, textStatus, errorThrown) {
         alert(message);
-        showMain();
+        loadMain();
     };
 }
 
 function showMain() {
     var main = $("#main");
+    history.replaceState(null, document.title, window.location.pathname);
     $("#salad").hide();
     resetSalad();
     resetCreateSaladForm();
