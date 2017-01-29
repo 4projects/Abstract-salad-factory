@@ -57,6 +57,10 @@ class Document(persistent.Persistent, Resource):
             return False
         return True
 
+    @classmethod
+    def create_from_json(cls, json, request=None):
+        return json
+
 
 class Salad(Document):
     """The salad."""
@@ -65,9 +69,11 @@ class Salad(Document):
         super().__init__()
         if not start_time:
             start_time = arrow.get()
+            # TODO set to next Thursday 12.30
             if start_time.time() > datetime.time(12, 00):
                 start_time = start_time.shift(days=1)
             start_time = start_time.replace(hour=12).floor('hour')
+        # TODO make sure it is iso formated
         self.start_time = arrow.get(start_time)
         self.location = location
         self.ingredients = IngredientCollection()
@@ -89,6 +95,13 @@ class Salad(Document):
                 return False
         return True
 
+    @classmethod
+    def create_from_json(cls, json, request=None):
+        if cls.is_valid_json(json):
+            return cls(start_time=json.get('startDate'),
+                       location=json.get('location'))
+        return json
+
 
 class Ingredient(Document):
     """A ingredient in a salad."""
@@ -106,10 +119,17 @@ class Ingredient(Document):
     def is_valid_json(cls, json):
         if not super().is_valid_json(json):
             return False
+        # The name and seller values must be filled.
         for name in ('name', 'seller'):
-            if name not in json:
+            if not json.get(name):
                 return False
         return True
+
+    @classmethod
+    def create_from_json(cls, json, request=None):
+        if cls.is_valid_json(json):
+            return cls(name=json['name'], owner=json['seller'])
+        return json
 
 
 class Comment(Document):

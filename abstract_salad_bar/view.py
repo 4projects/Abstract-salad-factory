@@ -104,14 +104,9 @@ def dump_json_ingredient(app, self, request):
 
 @app_module.SaladsApp.load_json()
 def load_json_salad(json, request):
-    if model.Salad.is_valid_json(json):
-        return model.Salad(start_time=json.get('startDate'),
-                           location=json.get('location'))
-    return json
+    return model.Salad.create_from_json(json, request)
 
 
 @app_module.IngredientsApp.load_json()
 def load_json_ingredient(json, request):
-    if model.Ingredient.is_valid_json(json):
-        return model.Ingredient(name=json['name'], owner=json['seller'])
-    return json
+    return model.Ingredient.create_from_json(json, request)
