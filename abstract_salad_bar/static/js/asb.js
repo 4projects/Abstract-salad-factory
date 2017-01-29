@@ -178,7 +178,7 @@ function resetCreateSaladForm() {
     $("#createSalad").trigger("reset");
     $("#createSalad").submit(postSalad);
     $("input[name=when]").change(setStartDate)
-    $("input[name=time]").change(setStartDate)
+    $("input[name=at]").change(setStartDate)
     var date = moment().tz(timezone).
         day(4).
         hours(12).minutes(30).
@@ -187,7 +187,7 @@ function resetCreateSaladForm() {
         date.add(7, "day"); // Make sure it is the next Thursday and not the last.
     }
     $("input[name=when]").attr("placeholder", date.calendar());
-    $("input[name=time]").attr("placeholder", date.format("LT"));
+    $("input[name=at]").attr("placeholder", date.format("LT"));
     $("input[name=startDate]").data("date", date);
     setStartDate();
 };
@@ -199,7 +199,7 @@ function getStartDate() {
     var now = false;
     var fromDay = false;
     var whenInput = $("input[name=when]").val().trim().toLowerCase();
-    var timeInput = $("input[name=time]").val().trim().toLowerCase();
+    var timeInput = $("input[name=at]").val().trim().toLowerCase();
     if (whenInput) {
         // Check for weekday. Does not work if text is put infront of weekday.
         // works: "Thursday", "thurs"
@@ -235,7 +235,7 @@ function getStartDate() {
     if (timeInput) {
         let time = moment(timeInput, ["HH:mm", "h:mm a"])
         if (!time.isValid()) {
-            let options = $("input[name=time]").data();
+            let options = $("input[name=at]").data();
             if (timeInput == options["same"]) {
                 time = moment();
             } else {
@@ -273,7 +273,7 @@ function setStartDate(event) {
         let timeError = invalid.indexOf("time") > -1;
         let dateError = invalid.indexOf("date") > -1;
         parentDiv.find("input[name=when]").toggleClass("error", dateError)
-        parentDiv.find("input[name=time]").toggleClass("error", timeError)
+        parentDiv.find("input[name=at]").toggleClass("error", timeError)
         helpBlock.find("#inputStartDateError").toggle(dateError);
         helpBlock.find("#inputStartTimeError").toggle(timeError);
         helpBlock.find("#andError").toggle(invalid.length > 1);
