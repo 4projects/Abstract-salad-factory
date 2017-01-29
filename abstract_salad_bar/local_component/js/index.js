@@ -21,22 +21,17 @@ function get_locale() {
         };
     };
     // Loop throug all locales.
-    locale_loop:
     for (var locale of locales) {
         locale = locale.replace('-', '_')
         // If locale is in any of the languages supported return locale.
         for (let known_locale of Object.keys(known_locales)) {
             if (known_locales[known_locale].indexOf(locale) > -1) {
-                break locale_loop;
+                return locale;
             }
         }
-        locale = null;
     }
-    // A not supported locale, set default.
-    if (locale == null) {
-        locale = "en"
-    }
-    return locale;
+    // A not supported locale, return default.
+    return "en"
 }
 
 var known_locales;
