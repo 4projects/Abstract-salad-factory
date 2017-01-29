@@ -99,7 +99,7 @@ class Salad(Document):
     def create_from_json(cls, json, request=None):
         if cls.is_valid_json(json):
             return cls(start_time=json.get('startDate'),
-                       location=json.get('location'))
+                       location=json.get('location', '').strip() or None)
         return json
 
 
@@ -121,14 +121,15 @@ class Ingredient(Document):
             return False
         # The name and seller values must be filled.
         for name in ('name', 'seller'):
-            if not json.get(name):
+            if not json.get(name, '').strip():
                 return False
         return True
 
     @classmethod
     def create_from_json(cls, json, request=None):
         if cls.is_valid_json(json):
-            return cls(name=json['name'], owner=json['seller'])
+            return cls(name=json['name'].strip(),
+                       owner=json['seller'].strip())
         return json
 
 
