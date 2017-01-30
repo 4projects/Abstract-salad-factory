@@ -36,6 +36,8 @@ function showSalad(data) {
     let salad = $("#salad");
     salad.data(data);
     salad.find("#saladLocation").append(data["location"]);
+    let url = "/#" + id;
+    salad.find("#saladUrl a").text(window.location.origin + url).attr("href", url);
     printStartDate(startDate, salad);
     salad.find("#createIngredient").submit(postIngredient(data["ingredients"]["@id"]));
     getIngredients(data);

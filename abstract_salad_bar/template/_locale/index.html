@@ -40,14 +40,15 @@
   </div>
   <div id="salad" hidden>
     <h1 i18n:translate="">Abstract Salad Bar</h1>
+    <h3 id=saladUrl" i18n:translate="">Use this url to share this Abstract Salad Bar with your friends: <a i18n:name="url"></a></h3>
     <h2 id="saladLocation" i18n:translate=""></h2>
     <h2 i18n:translate="">Starts <span class="saladStartDate" i18n:name="date"></span> at <span class="saladStartTime" i18n:name="time"></span>.</h2>
     <div  id=ingredients>
-    <h3 i18n:translate="">Ingredients</h3>
     <form id="createIngredient" autocomplete=off method="post">
       <input type="hidden" name="type" value="Offer" />
     </form>
     <table>
+      <caption i18n:translate="">Ingredients</caption>
       <thead>
         <tr>
           <th><label form="createIngredient" for="name" i18n:translate="">What?</label></th>
