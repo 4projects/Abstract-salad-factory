@@ -40,13 +40,13 @@ function showSalad(data) {
     salad.find("#createIngredient").submit(postIngredient(data["ingredients"]["@id"]));
     getIngredients(data);
     salad.show();
+    salad.find("input[name=name]")[0].focus();
 };
 
 function postIngredient(url) {
     return function(event) {
         event.preventDefault();
         var data = $(this).serializeObject();
-        console.log(data);
         // Empty the form.
         this.reset();
         $.ajax({
@@ -81,6 +81,8 @@ function showIngredient(data) {
     row.append($("<td>").text(data["itemOffered"]["name"]));
     row.append($("<td>").text(data["seller"]["name"]));
     $("#ingredients tbody").append(row);
+    // Focus on input.
+    $("#salad input[name=name]")[0].focus();
 };
 
 function loadApp() {
@@ -174,24 +176,29 @@ function showMain() {
     resetSalad();
     resetCreateSaladForm();
     main.show();
+    // Focus on input field after main is shown.
+    main.find("input[name=when]")[0].focus();
 }
 
 function resetCreateSaladForm() {
-    $("#createSalad .help-block").hide();
-    $("#createSalad").trigger("reset");
-    $("#createSalad").submit(postSalad);
-    $("input[name=when]").change(setStartDate)
-    $("input[name=at]").change(setStartDate)
+    var form = $("#createSalad");
+    form.find(".help-block").hide();
+    form[0].reset();
+    form.submit(postSalad);
+    var whenInput = form.find("input[name=when]");
+    var atInput = form.find("input[name=at]");
+    whenInput.change(setStartDate)
+    atInput.change(setStartDate)
     var date = moment().tz(timezone).
         day(4).
         hours(12).minutes(30).
-        startOf('minute'); // Thursday at 12.30 locale time.
+        startOf("minute"); // Thursday at 12.30 locale time.
     if (date < moment()) {
         date.add(7, "day"); // Make sure it is the next Thursday and not the last.
     }
-    $("input[name=when]").attr("placeholder", date.calendar());
-    $("input[name=at]").attr("placeholder", date.format("LT"));
-    $("input[name=startDate]").data("date", date);
+    whenInput.attr("placeholder", date.calendar());
+    atInput.attr("placeholder", date.format("LT"));
+    form.find("input[name=startDate]").data("date", date);
     setStartDate();
 };
 
@@ -273,7 +280,6 @@ function setStartDate(event) {
     parentDiv.find(".help-block").hide()
     for (let error of ["at", "when"]) {
         let input = parentDiv.find("input[name=" + error + "]");
-        console.log(input[0]);
         if (invalid.indexOf(error) > -1) {
             input[0].setCustomValidity(input.attr("errormessage"));
         } else {

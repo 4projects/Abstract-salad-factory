@@ -7,12 +7,12 @@
 <body>
   <div id="main" hidden>
   <h1 i18n:translate="" i18n:comment="hello">Create an Abstract Salad Bar!!!!!!!!!!!</h1>
-  <form id="createSalad" autocomplete=off action="/api/salads">
+  <form id="createSalad" autocomplete=off action="/api/salads" method="post">
     <input type="hidden" name="type" value="FoodEvent" />
     <input type="hidden" name="startDate" />
     <div>
       <label for="when"><span i18n:translate="">When?</span>
-        <input type="date" name="when" value="" class="saladStartDate" i18n:attributes="errormessage" list="dates" errormessage="Invalid date."/>
+        <input type="date" name="when" value="" class="saladStartDate" i18n:attributes="errormessage" list="dates" errormessage="Invalid date." autofocus/>
         <datalist id="dates">
           <option id="today" i18n:translate="">Today</option>
           <option id="tomorrow" i18n:translate="">Tomorrow</option>
@@ -44,7 +44,7 @@
     <h2 i18n:translate="">Starts <span class="saladStartDate" i18n:name="date"></span> at <span class="saladStartTime" i18n:name="time"></span>.</h2>
     <div  id=ingredients>
     <h3 i18n:translate="">Ingredients</h3>
-    <form id="createIngredient" autocomplete=off>
+    <form id="createIngredient" autocomplete=off method="post">
       <input type="hidden" name="type" value="Offer" />
     </form>
     <table>
@@ -57,7 +57,7 @@
       </thead>
       <tbody>
       <tr>
-          <td><input form="createIngredient" type="text" name="name" value="" required/>
+          <td><input form="createIngredient" type="text" name="name" value="" required autofocus/>
           <span class="help-block"></span></td>
           <td><input form="createIngredient" type="text" name="seller" value="" required/>
           <span class="help-block"></span></td>
