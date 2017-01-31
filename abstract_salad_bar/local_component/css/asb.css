@@ -1,0 +1,53 @@
+/* CSS - Cascading Style Sheet */
+/* Palette color codes */
+/* Palette URL: http://paletton.com/#uid=72P0u0kwi++bu++hX++++rd++kX */
+
+/* Feel free to copy&paste color codes to your application */
+
+
+/* As hex codes */
+:root {
+  --color-primary-0: #00FF00;	/* Main Primary color */
+  --color-primary-1: #A4FFA4;
+  --color-primary-2: #70FF70;
+  --color-primary-3: #00AD00;
+  --color-primary-4: #008500;
+
+  --color-secondary-1-0: #00FFFF;	/* Main Secondary color (1) */
+  --color-secondary-1-1: #A4FFFF;
+  --color-secondary-1-2: #70FFFF;
+  --color-secondary-1-3: #008282;
+  --color-secondary-1-4: #006464;
+
+  --color-secondary-2-0: #FF7400;	/* Main Secondary color (2) */
+  --color-secondary-2-1: #FFCDA4;
+  --color-secondary-2-2: #FFB170;
+  --color-secondary-2-3: #D96200;
+  --color-secondary-2-4: #A74C00;
+
+  --color-complement-0: #FF0000;	/* Main Complement color */
+  --color-complement-1: #FFA4A4;
+  --color-complement-2: #FF7070;
+  --color-complement-3: #D90000;
+  --color-complement-4: #A70000;
+}
+.asb-form-label {
+  margin-inline-end: 15px;
+  text-align: end;
+}
+
+.uk-width-xs {
+  max-width: 75px;
+}
+
+label[for=location] {
+  padding-left: 60px;
+}
+
+
+/* UIKit medium size */
+@media (max-width: 959px) {
+  .help-block {
+    margin-left: 90px;
+  }
+}
