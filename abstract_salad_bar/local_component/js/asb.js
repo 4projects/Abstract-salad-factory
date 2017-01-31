@@ -32,7 +32,7 @@ function showSalad(data) {
     var id = getId(data["@id"]);
     history.replaceState(data, data["location"], "#" + id);
     resetSalad();
-    $("#main").hide();
+    hideElement($("#create"));
     let salad = $("#salad");
     salad.data(data);
     salad.find("#saladLocation").append(data["location"]);
@@ -41,7 +41,7 @@ function showSalad(data) {
     printStartDate(startDate, salad);
     salad.find("#createIngredient").submit(postIngredient(data["ingredients"]["@id"]));
     getIngredients(data);
-    salad.show();
+    showElement(salad);
     salad.find("input[name=name]")[0].focus();
 };
 
@@ -98,7 +98,9 @@ function loadApp() {
     // timezone = "Europe/Amsterdam";
     moment.tz.setDefault(timezone);
     setMomentLocaleCalendars();
+    extendDatalists();
     saveEmptySalad();
+    setNav();
     if (currentState) {
         getSalad(currentState)
     } else {
@@ -106,11 +108,22 @@ function loadApp() {
     };
 }
 
+function setNav() {
+    $("#toCreate").click(loadCreate);
+}
+
+function extendDatalists() {
+    var datesList = $("#datesList");
+    for (let weekday of moment.weekdays()) {
+        datesList.append("<option>" + weekday + "</option>");
+    }
+}
+
 function showPage(event) {
     if (event.state) {
         getSalad(event.state)
     } else {
-        showMain();
+        showCreate();
     };
 };
 
@@ -131,7 +144,7 @@ function loadHash() {
         url = $("#createSalad").attr("action") + "/" + hash
         getSalad(url);
     } else {
-        showMain();
+        showCreate();
     };
 }
 
@@ -167,30 +180,30 @@ function SaladLoadFail(id) {
     }
     return function(jqXHR, textStatus, errorThrown) {
         alert(message);
-        loadMain();
+        loadCreate();
     };
 }
 
-function showMain() {
-    var main = $("#main");
+function showCreate() {
+    var createDiv = $("#create");
     history.replaceState(null, document.title, window.location.pathname);
-    $("#salad").hide();
+    hideElement($("#salad"));
     resetSalad();
     resetCreateSaladForm();
-    main.show();
-    // Focus on input field after main is shown.
-    main.find("input[name=when]")[0].focus();
+    showElement(createDiv);;
+    // Focus on input field after createDiv is shown.
+    createDiv.find("input[name=when]")[0].focus();
 }
 
 function resetCreateSaladForm() {
     var form = $("#createSalad");
-    form.find(".help-block").hide();
+    hideElement(form.find(".help-block"));
     form[0].reset();
     form.submit(postSalad);
     var whenInput = form.find("input[name=when]");
     var atInput = form.find("input[name=at]");
-    whenInput.change(setStartDate)
-    atInput.change(setStartDate)
+    whenInput.on("input", setStartDate)
+    atInput.on("input", setStartDate)
     var date = moment().tz(timezone).
         day(4).
         hours(12).minutes(30).
@@ -274,12 +287,13 @@ function getStartDate() {
 function setStartDate(event) {
     var [date, invalid] = getStartDate();
     if (event == null) {
-        var parentDiv = $("#createSalad input[name=when]").parents("div").first();
+        var parentDiv = $("#createSalad input[name=when]").parents("#startDateInput").first();
     } else {
-        var parentDiv = $(event.target).parents("div").first();
+        var parentDiv = $(event.target).parents("#startDateInput").first();
     }
     // Hide all help blocks.
-    parentDiv.find(".help-block").hide()
+    console.log(parentDiv);
+    hideElement(parentDiv.find(".help-block"));
     for (let error of ["at", "when"]) {
         let input = parentDiv.find("input[name=" + error + "]");
         if (invalid.indexOf(error) > -1) {
@@ -290,13 +304,15 @@ function setStartDate(event) {
     }
     if (!invalid.length) {
         if (date < moment()) {
-            var helpBlock = parentDiv.find(".help-block.warning");
+            var helpBlock = parentDiv.find("#startDatePast");
         } else {
-            var helpBlock = parentDiv.find(".help-block.success");
+            var helpBlock = parentDiv.find("#startDateCorrect");
         }
-        printStartDate(date, helpBlock);
-        helpBlock.show();
+    } else {
+        var helpBlock = parentDiv.find("#startDateInvalid");
     }
+    printStartDate(date, helpBlock);
+    showElement(helpBlock);
     $("input[name=startDate]").val(date.format());
 };
 
@@ -308,9 +324,9 @@ function printStartDate(date, block) {
     block.find(".saladStartTime").text(date.format("LT"));
 }
 
-function loadMain() {
+function loadCreate() {
     history.pushState(null, document.title, window.location.pathname);
-    showMain();
+    showCreate();
 };
 
 // Global variables, values are filled in the loadApp function.

@@ -13,6 +13,16 @@ function storageAvailable(type) {
 	}
 }
 
+function hideElement(element) {
+	console.log("hidding", element);
+	$(element).prop("hidden", true);
+}
+
+function showElement(element) {
+	console.log("showing", element);
+	$(element).prop("hidden", false);
+}
+
 function setMomentLocaleCalendars() {
 	if (moment != null) {
 		moment.updateLocale('en', {
