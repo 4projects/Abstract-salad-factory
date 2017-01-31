@@ -1,4 +1,3 @@
-import itertools
 import logging
 
 import bowerstatic
@@ -35,6 +34,7 @@ def get_static(app, tempdir):
     locale.LocaleApp.initialize('abstract_salad_bar/template',
                                 'abstract_salad_bar/locale', tempdir)
 
+
     @webob.dec.wsgify
     def app_with_static(request):
 
@@ -46,7 +46,7 @@ def get_static(app, tempdir):
 
         include = local.includer(request.environ)
         include('uikit')
-        include('awesomefonts')
+        include('font-awesome/css/font-awesome.css')
         include('asb/js/asb.js')
         include('asb/js/index.js')
         include('asb/js/util.js')
@@ -61,9 +61,8 @@ def get_static(app, tempdir):
         if peek == 'api':
             request.path_info_pop()
             handler = create_handler(app)
-        elif peek in itertools.chain.from_iterable(
-            locale.LocaleApp.known_locales.values()
-        ):
+        elif peek.replace('_', '-').lower() in \
+                locale.LocaleApp.known_languages:
             locale_app = locale.LocaleApp.get_app(peek)
             request.path_info_pop()
             # Include dependencies.
@@ -73,10 +72,10 @@ def get_static(app, tempdir):
             include('moment-timezone')
             # Try to include the right momentjs locale, else just
             # skip it.
-            for lang in (locale_app.languages):
+            for lang in locale_app.languages:
                 try:
                     include('moment/locale/{}.js'.format(
-                        lang.replace('_', '-').lower()
+                        lang.lower()
                     ))
                     break
                 except bowerstatic.Error:

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:source="en" i18n:domain="asb" tal:attributes="lang locale.replace('_', '-')">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:source="en" i18n:domain="asb" tal:attributes="lang str(locale).replace('_', '-')">
 <head>
   <meta charset="utf-8">
   <title>ASB</title>
@@ -102,5 +102,5 @@
   </footer>
 </body>
 <script type="text/javascript">window.onload = loadApp</script>
-<script type="text/javascript" tal:define="json_dump import: json.dumps" tal:content="string: var known_locales = ${json_dump(known_locales)}">var known_locales = {}</script>
+<script type="text/javascript" tal:content="string: var known_locales = ${json_known_locales}">var known_locales = {}</script>
 </html>

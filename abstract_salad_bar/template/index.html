@@ -9,10 +9,10 @@
   <!-- TODO add langauge chooser -->
   Please Choose a language:
   <ul id=languages tal:repeat="known_locale known_locales">
-    <li tal:content="known_locale.replace('_', '-')"></li>
+    <li tal:content="known_locale.get_display_name()"></li>
   </ul>
   </div>
 </body>
 <script type="text/javascript">window.onload = loadIndex</script>
-<script type="text/javascript" tal:define="json_dump import: json.dumps" tal:content="string: var known_locales = ${json_dump(known_locales)}">var known_locales = {}</script>
+<script type="text/javascript" tal:content="string: var known_locales = ${json_known_locales}">var known_locales = {}</script>
 </html>

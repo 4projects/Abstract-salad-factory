@@ -1,10 +1,13 @@
 import gettext
 from io import BytesIO
+import itertools
+import json
 import logging
 import os
 import re
 import time
 
+import babel
 from babel.messages.mofile import write_mo
 from babel.messages.pofile import read_po
 
@@ -19,16 +22,30 @@ NAME_RE = r"[a-zA-Z][-a-zA-Z0-9_]*"
 _interp_regex = re.compile(r'(?<!\$)(\$(?:({n})|{{({n})}}))'.format(n=NAME_RE))
 
 
+def parse_locale(locale):
+    """Return the language in lowercase and the country in uppercase."""
+    if not locale:
+        return ('', '')
+    lang, _, country = str(locale).replace('-', '_').partition('_')
+    lang = lang.lower()
+    country = country.upper()
+    return (lang, country)
+
+
 def get_languages_from_locale(locale):
     """The languages this locale supports.
 
-    From least to most specific.
+    From most to least specific.
     """
     languages = []
     if locale:
-        if '-' in locale:
-            languages.append(locale.split('-')[0])
-        languages.append(locale.replace('-', '_'))
+        # We always save languages with an '-' as separator in the
+        # languages tuple. We save language in lowercase and country
+        # in uppercase.
+        lang, country = parse_locale(locale)
+        if country:
+            languages.append('{}-{}'.format(lang, country))
+        languages.append(lang)
     return tuple(languages)
 
 
@@ -37,8 +54,8 @@ class LocaleApp(DirectoryApp):
 
     _initialized = False
     locales = {}
-    templatedir = localedir = tempdir = use_fuzzy = _kw = None
-    known_locales = {'en_US': get_languages_from_locale('en_US')}
+    known_locales = {babel.Locale.parse('en_US'):
+                     get_languages_from_locale('en-US')}
 
     @classmethod
     def initialize(cls, templatedir, localedir, tempdir,
@@ -52,13 +69,18 @@ class LocaleApp(DirectoryApp):
             cls._initialized = True
             for entry in os.scandir(cls.localedir):
                 if entry.is_dir():
-                    cls.known_locales[entry.name] = \
+                    cls.known_locales[babel.Locale.parse(entry.name)] = \
                         get_languages_from_locale(entry.name)
+            cls.known_languages = tuple(l.lower() for l in
+                                        itertools.chain.from_iterable(
+                                            cls.known_locales.values()
+                                        ))
 
     @classmethod
     def get_app(cls, locale):
-        locale = locale or ''
-        locale = locale.replace('_', '-')
+        locale, country = parse_locale(locale)
+        if country:
+            locale += '_{}'.format(country)
         log.debug('Getting locale for %s', locale)
         if locale not in cls.locales:
             log.debug('Can\'t find locale %s in dict', locale)
@@ -71,14 +93,16 @@ class LocaleApp(DirectoryApp):
         if not self._initialized:
             raise RuntimeError('Must Initialize LocaleApp before '
                                'creating an intance.')
-        self.locale = locale
-        self.outdir = os.path.join(self._tempdir, self.locale)
+        self.outdir = os.path.join(self._tempdir, locale)
         self._mtime = {}
         self._pofiles = {}
-        self.languages = get_languages_from_locale(self.locale)
-        if self.locale:
+        self.languages = get_languages_from_locale(locale)
+        if locale:
+            self.locale = babel.Locale.parse(locale)
             os.mkdir(self.outdir, mode=0o700)
             self.templatedir = os.path.join(self.templatedir, '_locale')
+        else:
+            self.locale = None
         super().__init__(self.templatedir, **self._kw)
 
     def is_dirty(self, path):
@@ -127,10 +151,15 @@ class LocaleApp(DirectoryApp):
             pofiles = []
             domain = os.path.splitext(self._get_relpath(path))[0]
             log.debug('Template %s has domain %s', path, domain)
-            for lang in self.languages:
+            for lang in reversed(self.languages):
+                lang, country = parse_locale(lang)
+                # For folders seperator is a '_'.
+                if country:
+                    lang = '{}_{}'.format(lang, country)
                 pofile = os.path.join(self.localedir, lang, 'LC_MESSAGES',
                                       '{}.po'.format(domain))
                 if os.path.exists(pofile):
+                    log.debug('Found lang file for "%s"', lang)
                     pofiles.append(pofile)
             self._pofiles[path] = pofiles
         return self._pofiles[path]
@@ -171,5 +200,8 @@ class LocaleApp(DirectoryApp):
                                                       translate=translate)
                 outpath.write(template.render(
                     locale=self.locale,
-                    known_locales=self.known_locales
+                    known_locales=self.known_locales,
+                    json_known_locales=json.dumps(
+                        {str(k).replace('_', '-'): v for k, v in
+                         self.known_locales.items()})
                 ))
