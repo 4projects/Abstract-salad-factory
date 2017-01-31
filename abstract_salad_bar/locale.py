@@ -184,6 +184,9 @@ class LocaleApp(DirectoryApp):
             translations = tl
 
         def translate(msgid, mapping=None, default=None, **kw):
+            # If no default is given this is not a msgid to translate.
+            if default is None:
+                return msgid
             translation = translations.gettext(msgid)
             if translation == msgid:
                 translation = default
