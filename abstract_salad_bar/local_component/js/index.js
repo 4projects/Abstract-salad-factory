@@ -22,10 +22,10 @@ function get_locale() {
     };
     // Loop throug all locales.
     for (var locale of locales) {
-        locale = locale.replace('-', '_')
+        let language = locale.replace('-', '_')
         // If locale is in any of the languages supported return locale.
         for (let known_locale of Object.keys(known_locales)) {
-            if (known_locales[known_locale].indexOf(locale) > -1) {
+            if (known_locales[known_locale].indexOf(language) > -1) {
                 return locale;
             }
         }
