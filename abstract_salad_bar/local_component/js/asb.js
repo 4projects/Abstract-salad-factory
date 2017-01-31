@@ -82,6 +82,7 @@ function showIngredient(data) {
     var row = $("<tr>");
     row.append($("<td>").text(data["itemOffered"]["name"]));
     row.append($("<td>").text(data["seller"]["name"]));
+    row.append($("<td>"));
     $("#ingredients tbody").append(row);
     // Focus on input.
     $("#salad input[name=name]")[0].focus();
