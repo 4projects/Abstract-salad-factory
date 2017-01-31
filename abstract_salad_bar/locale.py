@@ -26,9 +26,9 @@ def get_languages_from_locale(locale):
     """
     languages = []
     if locale:
-        if '_' in locale:
-            languages.append(locale.split('_')[0])
-        languages.append(locale)
+        if '-' in locale:
+            languages.append(locale.split('-')[0])
+        languages.append(locale.replace('-', '_'))
     return tuple(languages)
 
 
@@ -58,7 +58,7 @@ class LocaleApp(DirectoryApp):
     @classmethod
     def get_app(cls, locale):
         locale = locale or ''
-        locale = locale.replace('-', '_')
+        locale = locale.replace('_', '-')
         log.debug('Getting locale for %s', locale)
         if locale not in cls.locales:
             log.debug('Can\'t find locale %s in dict', locale)

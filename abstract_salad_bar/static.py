@@ -23,8 +23,9 @@ local = bower.local_components(
     'asb',
     components)
 
-asb = local.component(bowerstatic.module_relative_path('local_component'),
-                      version=None)
+asb_component = local.component(
+    bowerstatic.module_relative_path('local_component'),
+    version=None)
 
 static = DirectoryApp('abstract_salad_bar/static')
 
@@ -33,10 +34,6 @@ def get_static(app, tempdir):
 
     locale.LocaleApp.initialize('abstract_salad_bar/template',
                                 'abstract_salad_bar/locale', tempdir)
-
-    known_languages = tuple(itertools.chain(
-        locale.LocaleApp.known_locales.values()
-    ))
 
     @webob.dec.wsgify
     def app_with_static(request):
@@ -48,12 +45,16 @@ def get_static(app, tempdir):
             return handler
 
         include = local.includer(request.environ)
+        include('uikit')
+        include('awesomefonts')
         include('asb/js/asb.js')
         include('asb/js/index.js')
         include('asb/js/util.js')
-        if asb.autoversion:
-            bower_timestamp = get_latest_filesystem_datetime(asb.path).\
-                timestamp()
+        include('asb/css/asb.css')
+        if asb_component.autoversion:
+            bower_timestamp = get_latest_filesystem_datetime(
+                asb_component.path
+            ).timestamp()
         else:
             bower_timestamp = None
         peek = request.path_info_peek()
