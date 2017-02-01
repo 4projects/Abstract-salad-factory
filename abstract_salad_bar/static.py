@@ -26,14 +26,14 @@ asb_component = local.component(
     bowerstatic.module_relative_path('local_component'),
     version=None)
 
-static = DirectoryApp('abstract_salad_bar/static')
+static = DirectoryApp(bowerstatic.module_relative_path('static'))
 
 
 def get_static(app, tempdir):
 
-    locale.LocaleApp.initialize('abstract_salad_bar/template',
-                                'abstract_salad_bar/locale', tempdir)
-
+    locale.LocaleApp.initialize(bowerstatic.module_relative_path('template'),
+                                bowerstatic.module_relative_path('locale'),
+                                tempdir)
 
     @webob.dec.wsgify
     def app_with_static(request):
@@ -58,8 +58,11 @@ def get_static(app, tempdir):
         else:
             bower_timestamp = None
         peek = request.path_info_peek()
+        log.debug('Peek %s', peek)
         if peek == 'api':
+            log.debug('Going into api')
             request.path_info_pop()
+            log.debug(request.path_info)
             handler = create_handler(app)
         elif peek.replace('_', '-').lower() in \
                 locale.LocaleApp.known_languages:
