@@ -1,4 +1,5 @@
 import logging
+import sys
 from tempfile import TemporaryDirectory
 
 import morepath
@@ -16,6 +17,10 @@ log = logging.getLogger(__name__)
 
 
 def run():
+    try:
+        db_uri = sys.argv.pop(1)
+    except IndexError:
+        db_uri = 'memory://'
     # Initialize logging
     logging.basicConfig(level=logging.DEBUG)
 
@@ -23,8 +28,7 @@ def run():
     morepath.autoscan()
 
     # Get storage from config
-    uri = 'memory://'
-    storage_factory, dbkw = zodburi.resolve_uri(uri)
+    storage_factory, dbkw = zodburi.resolve_uri(db_uri)
     storage = storage_factory()
 
     # Create database and get root.
