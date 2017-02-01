@@ -2,13 +2,13 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:source="en" i18n:domain="asb" tal:attributes="lang str(locale).replace('_', '-')">
 <head>
   <meta charset="utf-8">
-  <title>ASB</title>
+  <title>ASF</title>
 </head>
 <body>
   <!-- The navigation bar -->
   <nav uk-navbar="dropbar: true; dropbar-mode: push;" class="uk-navbar-container">
     <div clas="uk-navbar-left">
-      <h1 class="uk-navbar-item uk-logo" i18n:translate="" >Abstract Salad Bar</h1>
+      <h1 class="uk-navbar-item uk-logo">Abstract Salad Factory</h1>
     </div>
     <div class="uk-navbar-right">
       <ul class="uk-navbar-nav">
@@ -33,7 +33,7 @@
   <div class="uk-container uk-container-small">
     <!-- The view to create a new salad.-->
     <div id="create" hidden>
-      <h2 i18n:translate="" i18n:comment="hello">Create an Abstract Salad Bar!!!!!!!!!!!</h2>
+      <h2 i18n:translate="" i18n:comment="hello">Create an Abstract Salad Factory!!!!!!!!!!!</h2>
       <form id="createSalad" action="/api/salads" method="post" class="uk-child-width-1-1" uk-grid>
         <input type="hidden" name="type" value="FoodEvent" />
         <input type="hidden" name="startDate" />
