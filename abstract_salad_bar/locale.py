@@ -7,6 +7,11 @@ import os
 import re
 import time
 
+try:
+    from os import scandir
+except ImportError:
+    from scandir import scandir
+
 import babel
 from babel.messages.mofile import write_mo
 from babel.messages.pofile import read_po
@@ -67,7 +72,7 @@ class LocaleApp(DirectoryApp):
             cls.use_fuzzy = use_fuzzy
             cls._kw = kw
             cls._initialized = True
-            for entry in os.scandir(cls.localedir):
+            for entry in scandir(cls.localedir):
                 if entry.is_dir():
                     cls.known_locales[babel.Locale.parse(entry.name)] = \
                         get_languages_from_locale(entry.name)

@@ -5,6 +5,8 @@ chameleon
 lingua
 morepath
 more.transaction
+pbr
+scandir; python_version<'3.5'
 shortuuid
 webob
 zodb
