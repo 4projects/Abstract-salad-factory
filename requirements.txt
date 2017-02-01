@@ -1,0 +1,11 @@
+arrow
+babel
+bowerstatic
+chameleon
+lingua
+morepath
+more.transaction
+shortuuid
+webob
+zodb
+zodburi
