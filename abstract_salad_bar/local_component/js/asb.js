@@ -30,6 +30,7 @@ function showSalad(data) {
     // Load a salad from the data.
     var startDate = moment.tz(data["startDate"], timezone);
     var id = getId(data["@id"]);
+    $("#toCreate").closest("li").removeClass("uk-active");
     history.replaceState(data, data["location"], "#" + id);
     resetSalad();
     hideElement($("#create"));
@@ -80,8 +81,8 @@ function showIngredients(data) {
 
 function showIngredient(data) {
     var row = $("<tr>");
-    row.append($("<td>").text(data["itemOffered"]["name"]));
-    row.append($("<td>").text(data["seller"]["name"]));
+    row.append($("<td>").addClass("uk-text-truncate").text(data["itemOffered"]["name"]));
+    row.append($("<td>").addClass("uk-text-truncate").text(data["seller"]["name"]));
     row.append($("<td>"));
     $("#ingredients tbody").append(row);
     // Focus on input.
@@ -110,7 +111,28 @@ function loadApp() {
 }
 
 function setNav() {
-    $("#toCreate").click(loadCreate);
+    $("#toCreate").click(navAttachClick(loadCreate, resetCreateSaladForm));
+    $("#changeLanguage ul a").click(navAttachClick(loadLanguage));
+}
+
+function loadLanguage(event) {
+    var url = event.target.href
+    window.location.assign(url + window.location.hash);
+}
+
+function navAttachClick(inactiveFunc, activeFunc) {
+    // Don't execute the click function if navigation is active.
+    return function(event) {
+        event.preventDefault();
+        if (!$(event.target).closest(".uk-active").length) {
+            console.log("Inactive function will be called for event", inactiveFunc, event);
+            return inactiveFunc(event);
+        } else if (activeFunc != null) {
+            console.log("Active function will be called for event", activeFunc, event);
+            return activeFunc(event);
+        }
+        console.log("No function will be called for event", event)
+    }
 }
 
 function extendDatalists() {
@@ -188,6 +210,7 @@ function SaladLoadFail(id) {
 function showCreate() {
     var createDiv = $("#create");
     history.replaceState(null, document.title, window.location.pathname);
+    $("#toCreate").closest("li").addClass("uk-active");
     hideElement($("#salad"));
     resetSalad();
     resetCreateSaladForm();

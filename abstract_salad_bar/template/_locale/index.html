@@ -6,16 +6,24 @@
 </head>
 <body>
   <!-- The navigation bar -->
-  <nav uk-navbar class="uk-navbar-container">
+  <nav uk-navbar="dropbar: true; dropbar-mode: push;" class="uk-navbar-container">
     <div clas="uk-navbar-left">
       <h1 class="uk-navbar-item uk-logo" i18n:translate="" >Abstract Salad Bar</h1>
     </div>
     <div class="uk-navbar-right">
       <ul class="uk-navbar-nav">
-        <li><a class="uk-button" i18n:translate="" id="toCreate">New</a></li>
-        <li><a i18n:attributes="aria-label" aria-label="Change language" id="changeLanguage">
-            <i class="fa fa-flag-o fa-lg" aria-hidden="true"></i>
-          </a></li>
+        <li><a i18n:translate="" id="toCreate">New</a></li>
+        <li>
+          <a i18n:attributes="aria-label" aria-label="Change language"><i class="fa fa-flag-o fa-lg" aria-hidden="true"></i></a>
+          <div id="changeLanguage" class="uk-navbar-dropdown" uk-drop="boundary: !.uk-nav-container; boundary-align: true; pos: bottom-justify; mode: click;">
+            <ul class="uk-nav uk-navbar-dropdown-nav" tal:repeat="known_locale known_locales">
+              <li tal:attributes="class 'uk-active' if known_locale == locale else None">
+                <a tal:attributes="href string: /${str(known_locale).replace('_', '-')}"
+                  tal:content="known_locale.get_display_name()"></a>
+              </li>
+            </ul>
+          </div>
+        </li>
         <li><a i18n:attributes="aria-label" aria-label="Help" id="toHelp">?</a></li>
       </ul>
     </div>
@@ -69,27 +77,29 @@
 
     <!-- The salad view. -->
     <div id="salad" hidden>
-      <h2 id=saladUrl" uk-alert class="uk-alert-primary uk-text-center" i18n:translate="">Share salad with your friends: <a i18n:name="url"></a></h2>
+      <h2 id=saladUrl" class="uk-card uk-card-body uk-card-title uk-card-primary uk-card-hover uk-text-center" i18n:translate="">Share salad with your friends: <br/><a class="uk-link-rest" i18n:name="url"></a></h2>
       <h3 id="saladLocation" i18n:translate=""></h3>
       <h3 i18n:translate="">Starts <span class="saladStartDate" i18n:name="date"></span> at <span class="saladStartTime" i18n:name="time"></span>.</h3>
       <div  id=ingredients>
         <form id="createIngredient" autocomplete=off method="post">
           <input type="hidden" name="type" value="Offer" />
         </form>
-        <table class="uk-table uk-table-small uk-table-striped">
-          <caption class="uk-text-uppercase uk-center" i18n:translate="">Ingredients</caption>
+        <table class="uk-table uk-table-small">
+          <caption class="uk-text-center" i18n:translate="">
+            <h4 class="uk-margin-remove uk-text-uppercase uk-text-muted">Ingredients</h4>
+          </caption>
           <thead>
             <tr>
-              <th><label form="createIngredient" for="name" i18n:translate="">What?</label></th>
-              <th><label form="createIngredient" for="seller" i18n:translate="">Who?</label></th>
-              <th></th>
+              <th class=""><label form="createIngredient" for="name" i18n:translate="">What?</label></th>
+              <th class=""><label form="createIngredient" for="seller" i18n:translate="">Who?</label></th>
+              <th class="uk-table-shrink"></th>
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="uk-background-muted">
               <td><input class="uk-input" form="createIngredient" type="text" name="name" value="" required autofocus/></td>
               <td><input class="uk-input" form="createIngredient" type="text" name="seller" value="" required/></td>
-              <td><button class="uk-button uk-button-default" form="createIngredient" type="submit" i18n:translate="">+</button></td>
+              <td><button class="uk-button uk-button-default uk-background" form="createIngredient" type="submit" i18n:translate="">+</button></td>
             </tr>
           </tbody>
         </table>
