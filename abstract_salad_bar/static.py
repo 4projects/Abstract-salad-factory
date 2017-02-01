@@ -44,6 +44,7 @@ def get_static(app, tempdir):
                 return request.get_response(app)
             return handler
 
+        log.debug('Request Environ: %s', request.environ)
         include = local.includer(request.environ)
         include('uikit')
         include('font-awesome/css/font-awesome.css')
