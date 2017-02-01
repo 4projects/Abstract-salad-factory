@@ -54,7 +54,7 @@ def dump_json_collection(app, self, request):
 @app_module.ResourceApp.dump_json(model.Root)
 def dump_json_root(app, self, request):
     data = {
-        'salads': dump_json_document(app.child(app_module.SaladsApp()),
+        'salads': dump_json_document(app.child(app_module.SaladsApp(self)),
                                      self.salads,
                                      request)
     }

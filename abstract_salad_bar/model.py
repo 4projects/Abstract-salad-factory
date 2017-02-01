@@ -139,8 +139,8 @@ class Comment(Document):
     pass
 
 
-class Root(Resource):
+class Root(Document):
 
-    def __init__(self, db):
-        print(db)
-        self.salads = db['salads']
+    def __init__(self):
+        super().__init__()
+        self.salads = SaladCollection()

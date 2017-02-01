@@ -1,10 +1,14 @@
+import logging
+
 from . import app
 from . import model
+
+log = logging.getLogger(__name__)
 
 
 @app.RootApp.path(model=model.Root, path='')
 def get_root_path(request):
-    return model.Root(request.app.db)
+    return request.app.db
 
 
 @app.ResourceApp.path(model=model.DocumentCollection, path='')
@@ -21,12 +25,13 @@ def get_document_path(request, id):
 def mount_ingredients(request, id):
     salad = request.app.db.get(id)
     if salad:
-        return app.IngredientsApp(salad=salad)
+        return app.IngredientsApp(salad)
 
 
 @app.RootApp.mount(path='salads', app=app.SaladsApp)
-def mount_salads():
-    return app.SaladsApp()
+def mount_salads(request):
+    root = request.app.db
+    return app.SaladsApp(root)
 
 
 # Trying to defer all links, but this does not seem to work.
