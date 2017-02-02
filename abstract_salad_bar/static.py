@@ -59,7 +59,7 @@ def get_static(app, tempdir):
         else:
             bower_timestamp = None
         peek = request.path_info_peek()
-        log.debug('Peek %s', peek)
+        log.debug('First part of path_info: %s', peek)
         if peek == 'api':
             log.debug('Going into api')
             request.path_info_pop()
