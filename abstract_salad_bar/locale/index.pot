@@ -1,0 +1,114 @@
+#
+# SOME DESCRIPTIVE TITLE
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE 1.0\n"
+"POT-Creation-Date: 2017-02-01 22:57-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 4.13\n"
+
+#: ./abstract_salad_bar/template/_locale/index.html:15
+msgid "New"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:17
+msgid "Change language"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:27
+msgid "Help"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:36
+msgid "Create an ${ASF}!!!!!!!!!!!"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:42
+msgid "When?"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:44
+#: ./abstract_salad_bar/template/_locale/index.html:63
+msgid "Invalid date."
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:46
+msgid "Today"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:47
+msgid "Tomorrow"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:48
+msgid "next Week"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:49
+msgid "Now"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:54
+msgid "at"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:56
+msgid "Invalid time."
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:58
+msgid "Same time"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:64
+msgid "${date} at ${time} is in the past!"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:65
+msgid "${ASF} starts ${date} at ${time}."
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:69
+msgid "Where?"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:70
+msgid "Somewhere"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:73
+msgid "Create!"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:80
+msgid "Share ${ASF} with your friends: ${br}${url}"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:82
+msgid "Starts ${date} at ${time}."
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:89
+msgid "Ingredients"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:93
+msgid "What?"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:94
+msgid "Who?"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:102
+msgid "+"
+msgstr ""

@@ -18,6 +18,8 @@ from babel.messages.pofile import read_po
 
 import chameleon
 
+from lingua import extract
+
 from webob.static import DirectoryApp
 
 log = logging.getLogger(__name__)
@@ -59,8 +61,8 @@ class LocaleApp(DirectoryApp):
 
     _initialized = False
     locales = {}
-    known_locales = {babel.Locale.parse('en_US'):
-                     get_languages_from_locale('en-US')}
+    known_locales = {babel.Locale.parse('en'):
+                     get_languages_from_locale('en')}
 
     @classmethod
     def initialize(cls, templatedir, localedir, tempdir,
@@ -167,6 +169,7 @@ class LocaleApp(DirectoryApp):
                     log.debug('Found lang file for "%s"', lang)
                     pofiles.append(pofile)
             self._pofiles[path] = pofiles
+            log.debug('Added pofiles: %s for locale %s', pofiles, self.locale)
         return self._pofiles[path]
 
     def _get_relpath(self, path):
@@ -179,13 +182,13 @@ class LocaleApp(DirectoryApp):
         translations = gettext.NullTranslations()
         for pofile in self.get_pofiles(path):
             # Mo file is in memory.
-            with BytesIO() as mofile:
+            with BytesIO() as mofile, open(pofile) as pofile:
                 # Generate mofile.
                 write_mo(mofile, read_po(pofile), use_fuzzy=self.use_fuzzy)
                 # Return to beginning of mofile.
                 mofile.seek(0)
                 tl = gettext.GNUTranslations(mofile)
-            tl.add_falback(translations)
+            tl.add_fallback(translations)
             translations = tl
 
         def translate(msgid, mapping=None, default=None, **kw):

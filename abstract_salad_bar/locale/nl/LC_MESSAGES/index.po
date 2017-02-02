@@ -1,0 +1,116 @@
+#
+# SOME DESCRIPTIVE TITLE
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE 1.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-02-01 22:57-0500\n"
+"PO-Revision-Date: 2017-02-01 22:04-0500\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS\n"
+"Language: nl\n"
+"Language-Team: nl <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: ./abstract_salad_bar/template/_locale/index.html:15
+msgid "New"
+msgstr "Nieuw"
+
+#: ./abstract_salad_bar/template/_locale/index.html:17
+msgid "Change language"
+msgstr "Kies taal"
+
+#: ./abstract_salad_bar/template/_locale/index.html:27
+msgid "Help"
+msgstr "Help"
+
+#: ./abstract_salad_bar/template/_locale/index.html:36
+msgid "Create an ${ASF}!!!!!!!!!!!"
+msgstr "Creeër een ${ASF}!!!!!!"
+
+#: ./abstract_salad_bar/template/_locale/index.html:42
+msgid "When?"
+msgstr "Wanneer"
+
+#: ./abstract_salad_bar/template/_locale/index.html:44
+#: ./abstract_salad_bar/template/_locale/index.html:63
+msgid "Invalid date."
+msgstr "Ongeldige datum."
+
+#: ./abstract_salad_bar/template/_locale/index.html:46
+msgid "Today"
+msgstr "vandaag"
+
+#: ./abstract_salad_bar/template/_locale/index.html:47
+msgid "Tomorrow"
+msgstr "morgen"
+
+#: ./abstract_salad_bar/template/_locale/index.html:48
+msgid "next Week"
+msgstr "volgende week"
+
+#: ./abstract_salad_bar/template/_locale/index.html:49
+msgid "Now"
+msgstr "nu"
+
+#: ./abstract_salad_bar/template/_locale/index.html:54
+msgid "at"
+msgstr "om"
+
+#: ./abstract_salad_bar/template/_locale/index.html:56
+msgid "Invalid time."
+msgstr "Ongeldige tijd."
+
+#: ./abstract_salad_bar/template/_locale/index.html:58
+msgid "Same time"
+msgstr "Zelfde tijd"
+
+#: ./abstract_salad_bar/template/_locale/index.html:64
+msgid "${date} at ${time} is in the past!"
+msgstr "${date} om ${time} is in het verleden!"
+
+#: ./abstract_salad_bar/template/_locale/index.html:65
+msgid "${ASF} starts ${date} at ${time}."
+msgstr "${ASF} begint ${date} om ${time}."
+
+#: ./abstract_salad_bar/template/_locale/index.html:69
+msgid "Where?"
+msgstr "Waar?"
+
+#: ./abstract_salad_bar/template/_locale/index.html:70
+msgid "Somewhere"
+msgstr "Ergens"
+
+#: ./abstract_salad_bar/template/_locale/index.html:73
+msgid "Create!"
+msgstr "Creeër"
+
+#: ./abstract_salad_bar/template/_locale/index.html:80
+msgid "Share ${ASF} with your friends: ${br}${url}"
+msgstr "Deel deze ${ASF} met je vrienden ${br}${url}"
+
+#: ./abstract_salad_bar/template/_locale/index.html:82
+msgid "Starts ${date} at ${time}."
+msgstr "Begint ${date} om ${time}."
+
+#: ./abstract_salad_bar/template/_locale/index.html:89
+msgid "Ingredients"
+msgstr "Ingrediënten"
+
+#: ./abstract_salad_bar/template/_locale/index.html:93
+msgid "What?"
+msgstr "Wat?"
+
+#: ./abstract_salad_bar/template/_locale/index.html:94
+msgid "Who?"
+msgstr "Wie?"
+
+#: ./abstract_salad_bar/template/_locale/index.html:102
+msgid "+"
+msgstr "+"
+
