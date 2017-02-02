@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-02-01 22:57-0500\n"
+"POT-Creation-Date: 2017-02-02 01:32-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,91 +24,91 @@ msgstr ""
 msgid "Change language"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:27
+#: ./abstract_salad_bar/template/_locale/index.html:28
 msgid "Help"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:36
+#: ./abstract_salad_bar/template/_locale/index.html:37
 msgid "Create an ${ASF}!!!!!!!!!!!"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:42
+#: ./abstract_salad_bar/template/_locale/index.html:43
 msgid "When?"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:44
-#: ./abstract_salad_bar/template/_locale/index.html:63
+#: ./abstract_salad_bar/template/_locale/index.html:45
+#: ./abstract_salad_bar/template/_locale/index.html:64
 msgid "Invalid date."
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:46
+#: ./abstract_salad_bar/template/_locale/index.html:47
 msgid "Today"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:47
+#: ./abstract_salad_bar/template/_locale/index.html:48
 msgid "Tomorrow"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:48
+#: ./abstract_salad_bar/template/_locale/index.html:49
 msgid "next Week"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:49
+#: ./abstract_salad_bar/template/_locale/index.html:50
 msgid "Now"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:54
+#: ./abstract_salad_bar/template/_locale/index.html:55
 msgid "at"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:56
+#: ./abstract_salad_bar/template/_locale/index.html:57
 msgid "Invalid time."
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:58
+#: ./abstract_salad_bar/template/_locale/index.html:59
 msgid "Same time"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:64
+#: ./abstract_salad_bar/template/_locale/index.html:65
 msgid "${date} at ${time} is in the past!"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:65
+#: ./abstract_salad_bar/template/_locale/index.html:66
 msgid "${ASF} starts ${date} at ${time}."
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:69
+#: ./abstract_salad_bar/template/_locale/index.html:70
 msgid "Where?"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:70
+#: ./abstract_salad_bar/template/_locale/index.html:71
 msgid "Somewhere"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:73
+#: ./abstract_salad_bar/template/_locale/index.html:74
 msgid "Create!"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:80
-msgid "Share ${ASF} with your friends: ${br}${url}"
+#: ./abstract_salad_bar/template/_locale/index.html:81
+msgid "Share this ${ASF} with your friends: ${br}${url}"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:82
+#: ./abstract_salad_bar/template/_locale/index.html:83
 msgid "Starts ${date} at ${time}."
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:89
+#: ./abstract_salad_bar/template/_locale/index.html:90
 msgid "Ingredients"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:93
+#: ./abstract_salad_bar/template/_locale/index.html:94
 msgid "What?"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:94
+#: ./abstract_salad_bar/template/_locale/index.html:95
 msgid "Who?"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:102
+#: ./abstract_salad_bar/template/_locale/index.html:103
 msgid "+"
 msgstr ""

@@ -61,8 +61,8 @@ class LocaleApp(DirectoryApp):
 
     _initialized = False
     locales = {}
-    known_locales = {babel.Locale.parse('en'):
-                     get_languages_from_locale('en')}
+    known_locales = {babel.Locale.parse('en_US'):
+                     get_languages_from_locale('en_US')}
 
     @classmethod
     def initialize(cls, templatedir, localedir, tempdir,
@@ -75,7 +75,7 @@ class LocaleApp(DirectoryApp):
             cls._kw = kw
             cls._initialized = True
             for entry in scandir(cls.localedir):
-                if entry.is_dir():
+                if entry.is_dir(follow_symlinks=False):
                     cls.known_locales[babel.Locale.parse(entry.name)] = \
                         get_languages_from_locale(entry.name)
             cls.known_languages = tuple(l.lower() for l in
