@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-02 01:32-0500\n"
+"POT-Creation-Date: 2017-02-02 23:18-0500\n"
 "PO-Revision-Date: 2017-02-01 22:04-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS\n"
-"Language: nl_NL\n"
+"Language: nl\n"
 "Language-Team: nl_NL <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
@@ -29,88 +29,134 @@ msgstr "Kies taal"
 msgid "Help"
 msgstr "Help"
 
-#: ./abstract_salad_bar/template/_locale/index.html:37
-msgid "Create an ${ASF}!!!!!!!!!!!"
-msgstr "Creeër een ${ASF}!!!!!!"
+#: ./abstract_salad_bar/template/_locale/index.html:38
+msgid "Welcom to the ${ASF} app!"
+msgstr "Welkom bij de ${ASF} app!"
 
-#: ./abstract_salad_bar/template/_locale/index.html:43
+#. Default: The idea of an ${ASF} is of course to make salads in a social and
+#. fun way! Decided the date and location everyone brings salad ingriedents and
+#. you can make your own little salad using any ingredients you want (like a
+#. salad bar, but with firends).
+#: ./abstract_salad_bar/template/_locale/index.html:41
+msgid "main help"
+msgstr ""
+"Het idee van een ${ASF} is natuurlijk om een salade te maken, in een "
+"sociale en leuke manier! Bepaal waar en wanneer, iedereen brengt salade "
+"ingrediënten. Nu kan je met de ingrediënten naar keuze je eigen mini "
+"salade maken (net als bij een salade buffet, maar met je vrienden)."
+
+#. Default: This page allows you to make an ${ASF} event to share different
+#. salady ingriedents with your friends. To start a date time and location and
+#. press the create button! You will go to the new event page, this will give
+#. you a link (in the blue box) to share with your friends and allows you to
+#. add ingredients you or other people will bring to the factory.
+#: ./abstract_salad_bar/template/_locale/index.html:44
+msgid "create help"
+msgstr ""
+"Het idee van een ${ASF} is natuurlijk om een salade te maken, in een "
+"sociale en leuke manier! Bepaal waar en wanneer, iedereen brengt salade "
+"ingrediënten. Nu kan je met de ingrediënten naar keuze je eigen mini "
+"salade maken (net als bij een salade buffet, maar met je vrienden)."
+
+#. Default: Someone shared a ${ASF} with you! Here you can see the link to
+#. share this Factory with other friends (in the blue box) and the ingredients
+#. people will be bringing and you can add your own.
+#: ./abstract_salad_bar/template/_locale/index.html:47
+msgid "salad help"
+msgstr ""
+"Iemand heeft een ${ASF} met je gedeelt! Op deze pagina zie je (in de "
+"blauwe kader) een link om deze salade te delen met andere vrienden, en de"
+" lijst met ingrediënten die iedereen meeneemt (vergeet niet zelf iets toe"
+" te voegen)."
+
+#: ./abstract_salad_bar/template/_locale/index.html:53
+msgid "You can totally use this app for any potluck like event!"
+msgstr ""
+"Je kan deze app natuurlijk ook gebruiken voor andere voedsel deel "
+"evenementen!"
+
+#: ./abstract_salad_bar/template/_locale/index.html:63
+msgid "Create an ${ASF}!"
+msgstr "Creëer een ${ASF}!"
+
+#: ./abstract_salad_bar/template/_locale/index.html:69
 msgid "When?"
 msgstr "Wanneer"
 
-#: ./abstract_salad_bar/template/_locale/index.html:45
-#: ./abstract_salad_bar/template/_locale/index.html:64
+#: ./abstract_salad_bar/template/_locale/index.html:71
+#: ./abstract_salad_bar/template/_locale/index.html:90
 msgid "Invalid date."
 msgstr "Ongeldige datum."
 
-#: ./abstract_salad_bar/template/_locale/index.html:47
+#: ./abstract_salad_bar/template/_locale/index.html:73
 msgid "Today"
 msgstr "vandaag"
 
-#: ./abstract_salad_bar/template/_locale/index.html:48
+#: ./abstract_salad_bar/template/_locale/index.html:74
 msgid "Tomorrow"
 msgstr "morgen"
 
-#: ./abstract_salad_bar/template/_locale/index.html:49
+#: ./abstract_salad_bar/template/_locale/index.html:75
 msgid "next Week"
 msgstr "volgende week"
 
-#: ./abstract_salad_bar/template/_locale/index.html:50
+#: ./abstract_salad_bar/template/_locale/index.html:76
 msgid "Now"
 msgstr "nu"
 
-#: ./abstract_salad_bar/template/_locale/index.html:55
+#: ./abstract_salad_bar/template/_locale/index.html:81
 msgid "at"
 msgstr "om"
 
-#: ./abstract_salad_bar/template/_locale/index.html:57
+#: ./abstract_salad_bar/template/_locale/index.html:83
 msgid "Invalid time."
 msgstr "Ongeldige tijd."
 
-#: ./abstract_salad_bar/template/_locale/index.html:59
+#: ./abstract_salad_bar/template/_locale/index.html:85
 msgid "Same time"
 msgstr "Zelfde tijd"
 
-#: ./abstract_salad_bar/template/_locale/index.html:65
+#: ./abstract_salad_bar/template/_locale/index.html:91
 msgid "${date} at ${time} is in the past!"
 msgstr "${date} om ${time} is in het verleden!"
 
-#: ./abstract_salad_bar/template/_locale/index.html:66
+#: ./abstract_salad_bar/template/_locale/index.html:92
 msgid "${ASF} starts ${date} at ${time}."
 msgstr "${ASF} begint ${date} om ${time}."
 
-#: ./abstract_salad_bar/template/_locale/index.html:70
+#: ./abstract_salad_bar/template/_locale/index.html:96
 msgid "Where?"
 msgstr "Waar?"
 
-#: ./abstract_salad_bar/template/_locale/index.html:71
+#: ./abstract_salad_bar/template/_locale/index.html:97
 msgid "Somewhere"
 msgstr "Ergens"
 
-#: ./abstract_salad_bar/template/_locale/index.html:74
+#: ./abstract_salad_bar/template/_locale/index.html:100
 msgid "Create!"
-msgstr "Creeër"
+msgstr "Creëer!"
 
-#: ./abstract_salad_bar/template/_locale/index.html:81
-msgid "Share this ${ASF} with your friends: ${br}${url}"
-msgstr "Deel deze ${ASF} met je vrienden ${br}${url}"
+#: ./abstract_salad_bar/template/_locale/index.html:108
+msgid "Share this ${ASF} with your friends:"
+msgstr "Deel deze ${ASF} met je vrienden:"
 
-#: ./abstract_salad_bar/template/_locale/index.html:83
+#: ./abstract_salad_bar/template/_locale/index.html:112
 msgid "Starts ${date} at ${time}."
 msgstr "Begint ${date} om ${time}."
 
-#: ./abstract_salad_bar/template/_locale/index.html:90
+#: ./abstract_salad_bar/template/_locale/index.html:119
 msgid "Ingredients"
 msgstr "Ingrediënten"
 
-#: ./abstract_salad_bar/template/_locale/index.html:94
+#: ./abstract_salad_bar/template/_locale/index.html:123
 msgid "What?"
 msgstr "Wat?"
 
-#: ./abstract_salad_bar/template/_locale/index.html:95
+#: ./abstract_salad_bar/template/_locale/index.html:124
 msgid "Who?"
 msgstr "Wie?"
 
-#: ./abstract_salad_bar/template/_locale/index.html:103
+#: ./abstract_salad_bar/template/_locale/index.html:132
 msgid "+"
 msgstr "+"
 

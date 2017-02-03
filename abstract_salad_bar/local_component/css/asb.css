@@ -45,9 +45,14 @@ label[for=location] {
 }
 
 
-/* UIKit medium size */
+/* UIKit smaller than medium size */
 @media (max-width: 959px) {
   .help-block {
     margin-left: 90px;
   }
+}
+
+#logo {
+  width: auto;
+  height: 75px;
 }

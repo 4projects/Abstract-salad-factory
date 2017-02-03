@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-02-02 01:32-0500\n"
+"POT-Creation-Date: 2017-02-02 23:18-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,87 +28,119 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:37
-msgid "Create an ${ASF}!!!!!!!!!!!"
+#: ./abstract_salad_bar/template/_locale/index.html:38
+msgid "Welcom to the ${ASF} app!"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:43
+#. Default: The idea of an ${ASF} is of course to make salads in a social and
+#. fun way! Decided the date and location everyone brings salad ingriedents and
+#. you can make your own little salad using any ingredients you want (like a
+#. salad bar, but with firends).
+#: ./abstract_salad_bar/template/_locale/index.html:41
+msgid "main help"
+msgstr ""
+
+#. Default: This page allows you to make an ${ASF} event to share different
+#. salady ingriedents with your friends. To start a date time and location and
+#. press the create button! You will go to the new event page, this will give
+#. you a link (in the blue box) to share with your friends and allows you to
+#. add ingredients you or other people will bring to the factory.
+#: ./abstract_salad_bar/template/_locale/index.html:44
+msgid "create help"
+msgstr ""
+
+#. Default: Someone shared a ${ASF} with you! Here you can see the link to
+#. share this Factory with other friends (in the blue box) and the ingredients
+#. people will be bringing and you can add your own.
+#: ./abstract_salad_bar/template/_locale/index.html:47
+msgid "salad help"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:53
+msgid "You can totally use this app for any potluck like event!"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:63
+msgid "Create an ${ASF}!"
+msgstr ""
+
+#: ./abstract_salad_bar/template/_locale/index.html:69
 msgid "When?"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:45
-#: ./abstract_salad_bar/template/_locale/index.html:64
+#: ./abstract_salad_bar/template/_locale/index.html:71
+#: ./abstract_salad_bar/template/_locale/index.html:90
 msgid "Invalid date."
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:47
+#: ./abstract_salad_bar/template/_locale/index.html:73
 msgid "Today"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:48
+#: ./abstract_salad_bar/template/_locale/index.html:74
 msgid "Tomorrow"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:49
+#: ./abstract_salad_bar/template/_locale/index.html:75
 msgid "next Week"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:50
+#: ./abstract_salad_bar/template/_locale/index.html:76
 msgid "Now"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:55
+#: ./abstract_salad_bar/template/_locale/index.html:81
 msgid "at"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:57
+#: ./abstract_salad_bar/template/_locale/index.html:83
 msgid "Invalid time."
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:59
+#: ./abstract_salad_bar/template/_locale/index.html:85
 msgid "Same time"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:65
+#: ./abstract_salad_bar/template/_locale/index.html:91
 msgid "${date} at ${time} is in the past!"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:66
+#: ./abstract_salad_bar/template/_locale/index.html:92
 msgid "${ASF} starts ${date} at ${time}."
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:70
+#: ./abstract_salad_bar/template/_locale/index.html:96
 msgid "Where?"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:71
+#: ./abstract_salad_bar/template/_locale/index.html:97
 msgid "Somewhere"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:74
+#: ./abstract_salad_bar/template/_locale/index.html:100
 msgid "Create!"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:81
-msgid "Share this ${ASF} with your friends: ${br}${url}"
+#: ./abstract_salad_bar/template/_locale/index.html:108
+msgid "Share this ${ASF} with your friends:"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:83
+#: ./abstract_salad_bar/template/_locale/index.html:112
 msgid "Starts ${date} at ${time}."
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:90
+#: ./abstract_salad_bar/template/_locale/index.html:119
 msgid "Ingredients"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:94
+#: ./abstract_salad_bar/template/_locale/index.html:123
 msgid "What?"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:95
+#: ./abstract_salad_bar/template/_locale/index.html:124
 msgid "Who?"
 msgstr ""
 
-#: ./abstract_salad_bar/template/_locale/index.html:103
+#: ./abstract_salad_bar/template/_locale/index.html:132
 msgid "+"
 msgstr ""

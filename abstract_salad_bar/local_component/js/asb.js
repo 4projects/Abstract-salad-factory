@@ -34,11 +34,14 @@ function showSalad(data) {
     history.replaceState(data, data["location"], "#" + id);
     resetSalad();
     hideElement($("#create"));
+    hideElement($("#createHelp"));
+    showElement($("#saladHelp"));
     let salad = $("#salad");
     salad.data(data);
     salad.find("#saladLocation").append(data["location"]);
     let url = "/#" + id;
-    salad.find("#saladUrl a").text(window.location.origin + url).attr("href", url);
+    let saladUrl = salad.find("#saladUrl");
+    saladUrl.find("a").text(window.location.origin + url).attr("href", url);
     printStartDate(startDate, salad);
     salad.find("#createIngredient").submit(postIngredient(data["ingredients"]["@id"]));
     getIngredients(data);
@@ -211,6 +214,8 @@ function showCreate() {
     var createDiv = $("#create");
     history.replaceState(null, document.title, window.location.pathname);
     $("#toCreate").closest("li").addClass("uk-active");
+    hideElement($("#saladHelp"));
+    showElement($("#createHelp"));
     hideElement($("#salad"));
     resetSalad();
     resetCreateSaladForm();
