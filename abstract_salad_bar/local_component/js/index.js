@@ -11,11 +11,11 @@ function loadIndex() {
 
 function get_locale() {
     // List of locales of the browser in prefered order.
-    var locales = window.navigator.languages;
-    if (storageAvailable(localStorage)) {
+    var locales = Array.from(window.navigator.languages);
+    if (storageAvailable("localStorage")) {
         // If localStorage exists try and get locale from there and
         // add it as most prefered locale.
-        var storage = localStorage;
+        var storage = window.localStorage;
         if (storage.getItem("locale")) {
             console.log("Found locale in localstorage, prepending it to array of locales.")
             locales.unshift(storage.getItem("locale"));

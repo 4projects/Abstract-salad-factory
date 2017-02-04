@@ -47,6 +47,7 @@ function showSalad(data) {
     getIngredients(data);
     showElement(salad);
     salad.find("input[name=name]")[0].focus();
+    showFirstTimeHelp();
 };
 
 function postIngredient(url) {
@@ -97,7 +98,10 @@ function loadApp() {
     var currentState = history.state;
     window.onpopstate = showPage;
     locale = document.documentElement.lang;
-    // TODO set the current locale in the local storage.
+    // Save the locale for next reload.
+    if (storageAvailable("localStorage")) {
+        window.localStorage.setItem("locale", locale);
+    }
     moment.locale(locale);
     timezone = moment.tz.guess();
     // timezone = "Europe/Amsterdam";
@@ -222,6 +226,7 @@ function showCreate() {
     showElement(createDiv);;
     // Focus on input field after createDiv is shown.
     createDiv.find("input[name=when]")[0].focus();
+    showFirstTimeHelp();
 }
 
 function resetCreateSaladForm() {
@@ -358,6 +363,15 @@ function loadCreate() {
     showCreate();
 };
 
+function showFirstTimeHelp() {
+    if (storageAvailable("localStorage")) {
+        var storage = window.localStorage;
+        if (!storage.getItem("notFirstTime")) {
+            storage.setItem("notFirstTime", true);
+            $("#toHelp").click();
+        }
+    }
+}
 // Global variables, values are filled in the loadApp function.
 var locale;
 var timezone;
