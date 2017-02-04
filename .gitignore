@@ -1,5 +1,27 @@
+# Byte-compiled / optimized
+__pycache__/
+*.py[co]
+
+# pbr
 /AUTHORS
 /ChangeLog
+
+# Distribution / packaging
+/env/
+/build/
 /dist/
 /*.egg-info/
+
+# Unit test / coverage reports
+/htmlcov/
+/.tox/
+/.coverage
+/.cache
+/nosetests.xml
+/coverage.xml
+
+# Sphinx documentation
+/docs/_build/
+
+# Ignore locales, explicitly add these
 /abstract_salad_bar/locale
