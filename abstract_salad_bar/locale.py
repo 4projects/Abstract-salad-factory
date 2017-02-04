@@ -76,8 +76,20 @@ class LocaleApp(DirectoryApp):
             cls._initialized = True
             for entry in scandir(cls.localedir):
                 if entry.is_dir(follow_symlinks=False):
+                    languages = get_languages_from_locale(entry.name)
+                    for lang in languages:
+                        path = os.path.join(cls.localedir,
+                                            lang.replace('-', '_'))
+                        log.debug('Path %s', path)
+                        try:
+                            os.symlink(entry.path, path,
+                                       target_is_directory=True)
+                            log.debug('Created symlink %s', path)
+                        except FileExistsError:
+                            log.debug('Locale path %s already exists', path)
+                            pass
                     cls.known_locales[babel.Locale.parse(entry.name)] = \
-                        get_languages_from_locale(entry.name)
+                        languages
             cls.known_languages = tuple(l.lower() for l in
                                         itertools.chain.from_iterable(
                                             cls.known_locales.values()

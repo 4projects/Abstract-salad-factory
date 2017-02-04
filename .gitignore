@@ -1,0 +1,5 @@
+AUTHORS
+ChangeLog
+dist/
+*.egg-info/
+abstract_salad_bar/locale
