@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width="75" height="75" version="1.1" viewBox="0 0 19.84375 19.843751" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <radialGradient id="radialGradient867" cx="9.9219" cy="287.08" r="1.4174" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#fff8f3" offset="0"/>
+   <stop stop-color="#fff8f3" stop-opacity="0" offset="1"/>
+  </radialGradient>
+ </defs>
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g transform="translate(0 -277.16)">
+  <ellipse cx="9.9219" cy="287.08" rx="9.6573" ry="9.6573" fill="#ffa358" fill-opacity=".99606" stroke="#ff7400" stroke-linecap="round" stroke-linejoin="bevel" stroke-width=".52917"/>
+  <circle cx="9.9219" cy="287.08" r="4.5357" fill="#ffc89a" fill-opacity=".99606"/>
+  <circle cx="9.9219" cy="287.08" r="1.4174" fill="url(#radialGradient867)"/>
+ </g>
+</svg>

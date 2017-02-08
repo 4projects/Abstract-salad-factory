@@ -374,7 +374,7 @@ function showFirstTimeHelp() {
     }
 }
 
-var vegetables = ["lettuce", "paprika", "tomato", "cucumber", "carrote"]
+var vegetables = ["lettuce", "olive", "walnut", "tomato", "cucumber", "carrote"]
 
 function loadVegetables() {
     // var vegetablesDiv = $("#vegetables");
