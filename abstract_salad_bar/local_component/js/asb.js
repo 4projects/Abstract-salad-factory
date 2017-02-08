@@ -115,6 +115,7 @@ function loadApp() {
     } else {
         loadHash();
     };
+    loadVegetables();
 }
 
 function setNav() {
@@ -372,6 +373,106 @@ function showFirstTimeHelp() {
         }
     }
 }
+
+var vegetables = ["lettuce", "paprika", "tomato", "cucumber", "carrote"]
+
+function loadVegetables() {
+    // var vegetablesDiv = $("#vegetables");
+    var deferreds = [];
+    for (let vegetable of vegetables) {
+        // Create a new deferred which will be resolved when the ajax call is complete (success or fail).
+        let deferred = $.Deferred();
+        deferreds.push(deferred);
+        // 
+        $.ajax({
+            url: "/images/vegetables/" + vegetable + ".svg",
+            complete: function(jqXHR, textStatus) {
+                // Add the jqXHR and text status tot the deferred object.
+                deferred.resolve(jqXHR, textStatus, vegetable)
+            },
+        })
+    }
+    $.when.apply(null, deferreds).done(function() {
+        var vegetablesDiv = $("#vegetables");
+        var serializer = new XMLSerializer();
+        // var diameter = 0;
+        // let draw = SVG("vegetables").attr("id", "logoNew");;
+        for (let result of arguments) {
+            // Skip result that did not load succesfully.
+            if (result[1] != "success") {
+                continue
+            }
+            let svgDoc = result[0].responseXML;
+            let svgData = $(serializer.serializeToString(svgDoc.documentElement)).attr("id", result[2]).addClass("vegetable");
+            // Move gradients out of svg into a seperate (none hidden) div.
+            vegetablesDiv.append(svgData);
+        }
+        animateVegetables(1);
+        // Add vegetables every 10 seconds.
+        // vegetableTimer = setInterval(animateVegetables, 10000);
+    })
+}
+
+
+function animateVegetables(counter) {
+    var fallingVegetablesDiv = $("#fallingVegetables");
+    if (counter < 50) {
+        setTimeout(animateVegetables, counter * 5000, counter + 1);
+    };
+    console.log("number of vegetable copies falling:", counter);
+    $("#vegetables > svg").each(function() {
+        // Clone vegetables
+        let vegetable = $(this).clone().attr("id", null).removeClass("vegetable");
+        vegetable.addClass("fallingVegetable");
+        readyVegetable(vegetable);
+        fallingVegetablesDiv.append(vegetable);
+        // add animationend event listener
+        // vegetable.on("animationend", function(event) {
+        //     console.log(event);
+        //     readyVegetable($(event.target));
+        // });
+    });
+}
+
+function readyVegetable(vegetable) {
+    // vegetable.css("Animation-play-state", "paused");
+    // vegetable.removeClass("fallingVegetable");
+    // set random position
+    vegetable.css("animation-name", "falling" + Math.floor(Math.random() * 6));
+    vegetable.css("left", Math.floor(-10 + Math.random() * 110) + "%");
+    // vegetable.css("transform", "rotate(" + Math.random() + "turn)")
+    // set speed randomish
+    vegetable.css("animation-duration", (5 + Math.random() * 10) + "s");
+    // vegetable.css("Animation-play-state", "running");
+    // void vegetable[0].offsetWidth;
+}
+
+function createLogo() {
+    // let draw = SVG($(svgData).attr("id", result[2])[0]);
+    // let svg = SVG.adopt(svgData.children("g")[0]);
+    // console.log(svg.transform());
+    // // svg.transform({x: 0, y: 0});
+    // console.log(svg.transform());
+    // // svg.rotate(45);
+    // console.log(svg.transform());
+    // console.log(svgData);
+    // let maxSide = Math.max.apply(null, svgData.attr("viewBox").split(/\s+/).map(Number));
+    // console.log(maxSide);
+    // draw.add(svg);
+    // if (maxSide > diameter) {
+    //     diameter = maxSide;
+    // }
+    // // if (result[2] == "lettuce") {
+    // //     draw.attr("viewBox", svgData.attr("viewBox"));
+    // // }
+    // // draw.use(svg);
+    // console.log(diameter);
+    // diameter = Math.sqrt(2 * diameter**2);
+    // console.log(diameter);
+    // draw.viewbox(0, 0, diameter, diameter);
+    // // console.log(draw);
+}
+
 // Global variables, values are filled in the loadApp function.
 var locale;
 var timezone;
