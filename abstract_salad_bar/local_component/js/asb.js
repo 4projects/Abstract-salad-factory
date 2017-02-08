@@ -121,6 +121,13 @@ function loadApp() {
 function setNav() {
     $("#toCreate").click(navAttachClick(loadCreate, resetCreateSaladForm));
     $("#changeLanguage ul a").click(navAttachClick(loadLanguage));
+    $("#toggleBackground").click(toggleBackground);
+}
+
+function toggleBackground() {
+    $("#toggleBackground .fa-ban").toggle();
+    console.log("Toggling background");
+    $("#fallingVegetables").toggle();
 }
 
 function loadLanguage(event) {
