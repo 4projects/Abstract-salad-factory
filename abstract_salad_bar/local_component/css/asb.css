@@ -78,6 +78,13 @@ label[for=location] {
   position: absolute;
 }
 
+/* Hide background on small displays. */
+@media (max-width: 639px) {
+  #fallingVegetables {
+    display: none;
+  }
+}
+
 .fallingVegetable {
   z-index: -1;
   position: absolute;
