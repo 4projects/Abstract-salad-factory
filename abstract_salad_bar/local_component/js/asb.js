@@ -402,6 +402,7 @@ function loadVegetables() {
     $.when.apply(null, deferreds).done(function() {
         var vegetablesDiv = $("#vegetables");
         var serializer = new XMLSerializer();
+        var defs = $("#globalDefs");
         // var diameter = 0;
         // let draw = SVG("vegetables").attr("id", "logoNew");;
         for (let result of arguments) {
@@ -412,6 +413,8 @@ function loadVegetables() {
             let svgDoc = result[0].responseXML;
             let svgData = $(serializer.serializeToString(svgDoc.documentElement)).attr("id", result[2]).addClass("vegetable");
             // Move gradients out of svg into a seperate (none hidden) div.
+            defs.append(svgData.find("defs").children());
+            // Put svg data in hidden div
             vegetablesDiv.append(svgData);
         }
         animateVegetables(1);
@@ -423,7 +426,7 @@ function loadVegetables() {
 
 function animateVegetables(counter) {
     var fallingVegetablesDiv = $("#fallingVegetables");
-    if (counter < 20) {
+    if (counter < 8) {
         setTimeout(animateVegetables, counter * 5000, counter + 1);
     };
     console.log("number of vegetable copies falling:", counter);
