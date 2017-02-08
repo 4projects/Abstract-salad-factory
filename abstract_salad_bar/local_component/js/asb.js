@@ -125,7 +125,7 @@ function setNav() {
 }
 
 function toggleBackground() {
-    $("#toggleBackground .fa-ban").toggle();
+    $("#toggleBackground #backgroundOff").toggle();
     console.log("Toggling background");
     $("#fallingVegetables").toggle();
 }

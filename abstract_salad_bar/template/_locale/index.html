@@ -28,9 +28,9 @@
           <div id="changeLanguage" class="uk-width-1-1 uk-navbar-dropdown" uk-drop="boundary: !.uk-nav-container; boundary-align: true; pos: bottom-justify; mode: click;">
             <ul tal:attributes="class 'uk-nav uk-navbar-dropdown-nav uk-nav-center uk-column-1-{}@m uk-column-divider'.format('3' if len(known_locales) >= 3 else '2' if len(known_locales) >= 2 else '1')" >
               <li tal:repeat="known_locale known_locales"
-                                                                           tal:attributes="class ' ' + 'uk-active ' if known_locale == locale else '' ">
+                  tal:attributes="class ' ' + 'uk-active ' if known_locale == locale else '' ">
                 <a tal:attributes="href string: /${str(known_locale).replace('_', '-')}"
-                                                                           tal:content="known_locale.get_display_name()"></a>
+                   tal:content="known_locale.get_display_name()"></a>
               </li>
             </ul>
           </div>
@@ -38,9 +38,8 @@
         <li class="uk-visible@s ">
           <a i18n:attributes="aria-label" aria-label="Toggle background" id="toggleBackground">
             <span class="fa-stack fa-lg">
-              <i class="fa fa-square fa-stack-2x" aria-hidden="true"></i>
-              <i class="fa fa-picture-o fa-stack-1x fa-inverse" aria-hidden="true"></i>
-              <i class="fa fa-ban fa-stack-2x" aria-hidden="true"></i>
+              <i class="fa fa-picture-o fa-stack-1x" aria-hidden="true"></i>
+              <span class="fa-stack-1x" id="backgroundOff" aria-hidden="true">x</span>
             </span>
           </a>
         </li>
