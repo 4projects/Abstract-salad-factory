@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width="125" height="126.53" version="1.1" viewBox="0 0 33.07294 33.47795" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <linearGradient id="linearGradient4507-3-3" x1="26.048" x2="26.048" y1="244.42" y2="273.87" gradientTransform="matrix(2.4846 0 0 2.4828 29.831 -575.76)" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#f0afeb" offset="0"/>
+   <stop stop-color="#fefafe" offset="1"/>
+  </linearGradient>
+ </defs>
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g transform="translate(-9.5118 -251.11)">
+  <path transform="matrix(.26458 0 0 .26458 1.0315 243.54)" d="m73.451 29.611c-18.379 0.38543-41.87 3.5499-40.33 17.395 2.5074 22.549 46.199 40.116 58.297 67.178 3.3933 7.5901 3.1348 24.742 3.1348 24.742s-0.26046-17.152 3.1328-24.742c12.098-27.062 55.79-44.628 58.297-67.178 1.5401-13.851-21.969-17.005-40.352-17.389a21.389 2.41 0 0 1 -21.078 2.0176 21.389 2.41 0 0 1 -21.102 -2.0234z" fill="url(#linearGradient4507-3-3)" stroke="#9e1993" stroke-linejoin="bevel" stroke-width="2" style="paint-order:normal"/>
+  <path transform="matrix(4.003 0 0 37.448 -78.223 -10229)" d="m26.048 280.75-0.0661-0.11448h0.13219z" fill="#9e1993"/>
+  <rect x="25.784" y="280.22" width=".52917" height=".08476" fill="#9e1993"/>
+ </g>
+</svg>
