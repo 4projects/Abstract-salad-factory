@@ -416,7 +416,7 @@ function loadVegetables() {
 
 function animateVegetables(counter) {
     var fallingVegetablesDiv = $("#fallingVegetables");
-    if (counter < 50) {
+    if (counter < 20) {
         setTimeout(animateVegetables, counter * 5000, counter + 1);
     };
     console.log("number of vegetable copies falling:", counter);
