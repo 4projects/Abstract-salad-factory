@@ -91,36 +91,36 @@ label[for=location] {
 @keyframes falling0 {
   to {
     bottom: 0;
-    transform: translate(0, 100%) rotate3d(1, 1, 1, -1turn);
+    transform: translate(0, 100%) rotate3d(1, 1, 1, -2turn);
   }
 }
 @keyframes falling1 {
   to {
     bottom: 0;
-    transform: translate(0, 100%) rotate3d(1, 1, 1, 1turn);
+    transform: translate(0, 100%) rotate3d(1, 1, 1, 2turn);
   }
 }
 @keyframes falling2 {
   to {
     bottom: 0;
-    transform: translate(0, 100%) rotate3d(1, 1, 2, -1turn);
+    transform: translate(0, 100%) rotate3d(1, 1, 2, -2turn);
   }
 }
 @keyframes falling3 {
   to {
     bottom: 0;
-    transform: translate(0, 100%) rotate3d(1, 1, 2, 1turn);
+    transform: translate(0, 100%) rotate3d(1, 1, 2, 2turn);
   }
 }
 @keyframes falling4 {
   to {
     bottom: 0;
-    transform: translate(0, 100%) rotate3d(1, 2, 1, 1turn);
+    transform: translate(0, 100%) rotate3d(1, 2, 1, 2turn);
   }
 }
 @keyframes falling5 {
   to {
     bottom: 0;
-    transform: translate(0, 100%) rotate3d(1, 2, 1, -1turn);
+    transform: translate(0, 100%) rotate3d(1, 2, 1, -2turn);
   }
 }
