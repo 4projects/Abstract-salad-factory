@@ -6,7 +6,7 @@ from . import model
 log = logging.getLogger(__name__)
 
 
-@app.RootApp.path(model=model.Root, path='')
+@app.RootApp.path(model=model.RootDocument, path='')
 def get_root_path(request):
     return request.app.db
 

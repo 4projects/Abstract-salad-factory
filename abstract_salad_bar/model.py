@@ -15,16 +15,43 @@ class Resource(object):
 
     schema_type = 'Thing'
 
+    def dump_json(self, request):
+        json = {
+            '@type': self.schema_type,
+            '@id': request.link(self)
+        }
+        json.update({'@context': 'http://schema.org'})
+        return json
+
 
 class DocumentCollection(BTree, Resource):
 
     # schema itemList
+    def __init__(self, parent):
+        self.parent = parent
+        super().__init__()
 
     def add(self, obj):
         self[obj.id] = obj
         return obj
 
     schema_type = 'ItemList'
+
+    def dump_json(self, request):
+        if request.params.get('full'):
+            def item_function(document):
+                return request.app._dump_json(document, request)
+        else:
+            def item_function(document):
+                return {
+                    '@id': request.link(document),
+                    '@type': document.schema_type,
+                }
+        json = {
+            'itemListElement': [item_function(v) for v in self.values()],
+        }
+        json.update(super().dump_json(request))
+        return json
 
 
 class SaladCollection(DocumentCollection):
@@ -43,10 +70,6 @@ class Document(persistent.Persistent, Resource):
     def __init__(self):
         self.id = shortuuid.uuid()
 
-    @property
-    def schema_type(self):
-        return self.__class__.__name__
-
     @classmethod
     def is_valid_json(cls, json):
         log.debug('Validating abject of type [ %s ]', cls.__name__)
@@ -61,8 +84,11 @@ class Document(persistent.Persistent, Resource):
     def create_from_json(cls, json, request=None):
         return json
 
+    def dump_json(self, request):
+        return super().dump_json(request)
 
-class Salad(Document):
+
+class SaladDocument(Document):
     """The salad."""
 
     def __init__(self, start_time=None, location=None):
@@ -76,8 +102,8 @@ class Salad(Document):
         # TODO make sure it is iso formated
         self.start_time = arrow.get(start_time)
         self.location = location
-        self.ingredients = IngredientCollection()
-        self.comments = CommentCollection()
+        self.ingredients = IngredientCollection(self)
+        self.comments = CommentCollection(self)
 
     schema_type = 'FoodEvent'
 
@@ -102,8 +128,20 @@ class Salad(Document):
                        location=json.get('location', '').strip() or None)
         return json
 
+    def dump_json(self, request):
+        json = {
+            'startDate': self.start_time.isoformat(),
+            'location': self.location,
+            'ingredients': {
+                '@id': request.link(self, 'ingredients'),
+                '@type': self.ingredients.schema_type
+            },
+        }
+        json.update(super().dump_json(request))
+        return json
 
-class Ingredient(Document):
+
+class IngredientDocument(Document):
     """A ingredient in a salad."""
 
     def __init__(self, name, owner):
@@ -132,15 +170,41 @@ class Ingredient(Document):
                        owner=json['seller'].strip())
         return json
 
+    def dump_json(self, request):
+        json = {
+            'seller': {
+                '@type': 'Person',
+                'name': self.owner,
+            },
+            'itemOffered': {
+                '@type': 'Product',
+                'name': self.name,
+            }
+        }
+        json.update(super().dump_json(request))
+        return json
 
-class Comment(Document):
+
+class CommentDocument(Document):
     """A comment attached to a salad."""
 
     pass
 
 
-class Root(Document):
+class RootDocument(Document):
 
     def __init__(self):
         super().__init__()
-        self.salads = SaladCollection()
+        self.salads = SaladCollection(self)
+
+    def dump_json(self, request):
+        json = {
+            'salads': {
+                '@id': request.link(self.salads),
+                '@type': self.salads.schema_type,
+            }
+        }
+        json.update(super().dump_json(request))
+        return json
+
+

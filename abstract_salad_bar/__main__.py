@@ -10,7 +10,7 @@ import ZODB
 import zodburi
 
 from .app import App
-from .model import Root
+from .model import RootDocument
 from .static import get_static
 
 log = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ def run():
     db = ZODB.DB(storage, **dbkw).open()
     root = db.root()
     if 'root' not in root:
-        root['root'] = Root()
+        root['root'] = RootDocument()
         transaction.commit()
     root = root['root']
     log.debug('Root id %s', root.id)
