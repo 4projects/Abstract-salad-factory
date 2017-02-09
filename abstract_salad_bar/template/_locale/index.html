@@ -24,7 +24,7 @@
       <ul class="uk-navbar-nav">
         <li><a i18n:translate="" id="toCreate">New</a></li>
         <li>
-          <a i18n:attributes="aria-label" aria-label="Change language"><i class="fa fa-flag-o fa-lg" aria-hidden="true"></i></a>
+          <a i18n:attributes="aria-label" aria-label="Change language"><i class="fa fa-globe fa-lg" aria-hidden="true"></i></a>
           <div id="changeLanguage" class="uk-width-1-1 uk-navbar-dropdown" uk-drop="boundary: !.uk-nav-container; boundary-align: true; pos: bottom-justify; mode: click;">
             <ul tal:attributes="class 'uk-nav uk-navbar-dropdown-nav uk-nav-center uk-column-1-{}@m uk-column-divider'.format('3' if len(known_locales) >= 3 else '2' if len(known_locales) >= 2 else '1')" >
               <li tal:repeat="known_locale known_locales"
