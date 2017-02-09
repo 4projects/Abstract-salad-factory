@@ -46,6 +46,7 @@ def get_static(app, tempdir):
 
         log.debug('Request Environ: %s', request.environ)
         include = local.includer(request.environ)
+        include('normalize-css')
         include('uikit')
         include('font-awesome/css/font-awesome.css')
         include('asb/js/asb.js')
