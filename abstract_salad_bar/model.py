@@ -91,6 +91,10 @@ class Document(persistent.Persistent, Resource):
     def dump_json(self, request):
         return super().dump_json(request)
 
+    def _dump_json_attr(self, attribute, request):
+        return {'@id': request.link(self, attribute),
+                '@type': getattr(self, attribute).schema_type}
+
 
 class SaladDocument(Document):
     """The salad."""
@@ -136,10 +140,7 @@ class SaladDocument(Document):
         json = {
             'startDate': self.start_time.isoformat(),
             'location': self.location,
-            'ingredients': {
-                '@id': request.link(self, 'ingredients'),
-                '@type': self.ingredients.schema_type
-            },
+            'ingredients': self._dump_json_attr('ingredients', request)
         }
         json.update(super().dump_json(request))
         return json
