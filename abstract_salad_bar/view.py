@@ -50,9 +50,9 @@ def dump_json(self, request):
 
 @app_module.SaladsApp.load_json()
 def load_json_salad(json, request):
-    return model.SaladDocument.create_from_json(json, request)
+    return model.SaladDocument.load_json(json, request)
 
 
 @app_module.IngredientsApp.load_json()
 def load_json_ingredient(json, request):
-    return model.IngredientDocument.create_from_json(json, request)
+    return model.IngredientDocument.load_json(json, request)

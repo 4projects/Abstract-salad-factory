@@ -23,6 +23,10 @@ class Resource(object):
         json.update({'@context': 'http://schema.org'})
         return json
 
+    @classmethod
+    def load_json(cls, json, request=None):
+        return json
+
 
 class DocumentCollection(BTree, Resource):
 
@@ -81,8 +85,8 @@ class Document(persistent.Persistent, Resource):
         return True
 
     @classmethod
-    def create_from_json(cls, json, request=None):
-        return json
+    def load_json(cls, json, request=None):
+        return super(Document, cls).load_json(json, request)
 
     def dump_json(self, request):
         return super().dump_json(request)
@@ -122,11 +126,11 @@ class SaladDocument(Document):
         return True
 
     @classmethod
-    def create_from_json(cls, json, request=None):
+    def load_json(cls, json, request=None):
         if cls.is_valid_json(json):
             return cls(start_time=json.get('startDate'),
                        location=json.get('location', '').strip() or None)
-        return json
+        return super(SaladDocument, cls).load_json(json, request)
 
     def dump_json(self, request):
         json = {
@@ -164,11 +168,11 @@ class IngredientDocument(Document):
         return True
 
     @classmethod
-    def create_from_json(cls, json, request=None):
+    def load_json(cls, json, request=None):
         if cls.is_valid_json(json):
             return cls(name=json['name'].strip(),
                        owner=json['seller'].strip())
-        return json
+        return super(IngredientDocument, cls).load_json(json, request)
 
     def dump_json(self, request):
         json = {
