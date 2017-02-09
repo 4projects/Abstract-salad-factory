@@ -1,17 +1,16 @@
 {
   "name": "uikit",
   "homepage": "https://github.com/uikit/uikit",
-  "_release": "e51fb1846d",
+  "_release": "7c660b3365",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "e51fb1846d080b2d2363e469b1329a7748b20c00"
+    "commit": "7c660b3365bd7251ec381494273567f08fe217f3"
   },
   "_source": "https://github.com/uikit/uikit.git",
   "_target": "master",
   "_originalSource": "https://github.com/uikit/uikit.git",
-  "_direct": true,
-  "version": "3.0.0-beta.6",
+  "version": "3.0.0-beta.9",
   "dependencies": {
     "jquery": "^3.1.1"
   },
