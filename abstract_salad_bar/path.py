@@ -3,7 +3,6 @@ import logging
 from . import app
 from . import model
 
-log = logging.getLogger(__name__)
 
 
 @app.RootApp.path(model=model.RootDocument, path='')

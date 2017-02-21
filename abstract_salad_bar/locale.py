@@ -22,7 +22,6 @@ from lingua import extract
 
 from webob.static import DirectoryApp
 
-log = logging.getLogger(__name__)
 
 NAME_RE = r"[a-zA-Z][-a-zA-Z0-9_]*"
 
@@ -68,6 +67,7 @@ class LocaleApp(DirectoryApp):
     def initialize(cls, templatedir, localedir, tempdir,
                    use_fuzzy=False, **kw):
         if not cls._initialized:
+            cls.log = logging.getLogger(__name__)
             cls.templatedir = os.path.abspath(templatedir)
             cls.localedir = os.path.abspath(localedir)
             cls._tempdir = os.path.abspath(tempdir)
@@ -80,13 +80,14 @@ class LocaleApp(DirectoryApp):
                     for lang in languages:
                         path = os.path.join(cls.localedir,
                                             lang.replace('-', '_'))
-                        log.debug('Path %s', path)
+                        cls.log.debug('Path %s', path)
                         try:
                             os.symlink(entry.path, path,
                                        target_is_directory=True)
-                            log.debug('Created symlink %s', path)
+                            cls.log.debug('Created symlink %s', path)
                         except FileExistsError:
-                            log.debug('Locale path %s already exists', path)
+                            cls.log.debug('Locale path %s already exists',
+                                          path)
                             pass
                     cls.known_locales[babel.Locale.parse(entry.name)] = \
                         languages
@@ -100,12 +101,12 @@ class LocaleApp(DirectoryApp):
         locale, country = parse_locale(locale)
         if country:
             locale += '_{}'.format(country)
-        log.debug('Getting locale for %s', locale)
+        cls.log.debug('Getting locale for %s', locale)
         if locale not in cls.locales:
-            log.debug('Can\'t find locale %s in dict', locale)
+            cls.log.debug('Can\'t find locale %s in dict', locale)
             cls.locales[locale] = cls(locale)
         else:
-            log.debug('Loading %s from dict', locale)
+            cls.log.debug('Loading %s from dict', locale)
         return cls.locales[locale]
 
     def __init__(self, locale):
@@ -127,8 +128,8 @@ class LocaleApp(DirectoryApp):
     def is_dirty(self, path):
         current_mtime = self.get_real_mtime(path)
         mtime = self._mtime.get(path, 0)
-        log.debug('Current mtime %s, original mtime %s.', current_mtime,
-                  mtime)
+        self.log.debug('Current mtime %s, original mtime %s.', current_mtime,
+                       mtime)
         if current_mtime > mtime:
             self._mtime[path] = current_mtime
             return True
@@ -136,7 +137,7 @@ class LocaleApp(DirectoryApp):
 
     def get_real_mtime(self, path):
         mtime = os.path.getmtime(path)
-        log.debug('File "%s" mtime: %s', path, mtime)
+        self.log.debug('File "%s" mtime: %s', path, mtime)
         for pofile in self.get_pofiles(path):
             mtime = max(mtime, os.path.getmtime(pofile))
         return mtime
@@ -145,15 +146,15 @@ class LocaleApp(DirectoryApp):
         if bust_time is None:
             bust_time = time.time()
         utime = (bust_time, bust_time)
-        log.debug('Busting cache, bust time: %s', bust_time)
+        self.log.debug('Busting cache, bust time: %s', bust_time)
         for path in self._mtime:
             if os.path.getmtime(path) < bust_time:
                 os.utime(path, utime)
 
     def make_fileapp(self, path):
-        log.debug('Getting path: %s for locale %s', path, self.locale)
+        self.log.debug('Getting path: %s for locale %s', path, self.locale)
         if self.is_dirty(path):
-            log.debug('File is dirty, reloading translation.')
+            self.log.debug('File is dirty, reloading translation.')
             self.reload_translations(path)
         return super().make_fileapp(self.get_outpath(path))
 
@@ -165,11 +166,11 @@ class LocaleApp(DirectoryApp):
         if not self.locale:
             return []
         if path not in self._pofiles:
-            log.debug('Finding .po files for path %s and locale %s',
-                      path, self.locale)
+            self.log.debug('Finding .po files for path %s and locale %s',
+                           path, self.locale)
             pofiles = []
             domain = os.path.splitext(self._get_relpath(path))[0]
-            log.debug('Template %s has domain %s', path, domain)
+            self.log.debug('Template %s has domain %s', path, domain)
             for lang in reversed(self.languages):
                 lang, country = parse_locale(lang)
                 # For folders seperator is a '_'.
@@ -178,10 +179,11 @@ class LocaleApp(DirectoryApp):
                 pofile = os.path.join(self.localedir, lang, 'LC_MESSAGES',
                                       '{}.po'.format(domain))
                 if os.path.exists(pofile):
-                    log.debug('Found lang file for "%s"', lang)
+                    self.log.debug('Found lang file for "%s"', lang)
                     pofiles.append(pofile)
             self._pofiles[path] = pofiles
-            log.debug('Added pofiles: %s for locale %s', pofiles, self.locale)
+            self.log.debug('Added pofiles: %s for locale %s',
+                           pofiles, self.locale)
         return self._pofiles[path]
 
     def _get_relpath(self, path):

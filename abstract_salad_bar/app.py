@@ -3,8 +3,6 @@ import logging
 import morepath
 from more.transaction import TransactionApp
 
-log = logging.getLogger(__name__)
-
 # Tweens only work on the root app. So set the root app as the TransactionApp,
 # to make sure the transaction tween is run.
 

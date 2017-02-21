@@ -9,8 +9,6 @@ from webob.static import DirectoryApp
 from . import locale
 
 
-log = logging.getLogger(__name__)
-
 bower = bowerstatic.Bower()
 
 components = bower.components(
@@ -30,6 +28,8 @@ static = DirectoryApp(bowerstatic.module_relative_path('static'))
 
 
 def get_static(app, tempdir):
+
+    log = logging.getLogger(__name__)
 
     locale.LocaleApp.initialize(bowerstatic.module_relative_path('template'),
                                 bowerstatic.module_relative_path('locale'),
