@@ -21,6 +21,11 @@ def get_document_path(request, id):
     return request.app.db.get(id)
 
 
+@app.WebsocketApp.path(model=model.Websocket, path='')
+def get_websocket_path(request):
+    return model.Websocket()
+
+
 @app.SaladsApp.mount(path='{id}/ingredients', app=app.IngredientsApp)
 def mount_ingredients(request, id):
     salad = request.app.db.get(id)
@@ -32,6 +37,11 @@ def mount_ingredients(request, id):
 def mount_salads(request):
     root = request.app.db
     return app.SaladsApp(root)
+
+
+@app.ResourceApp.mount(path='ws', app=app.WebsocketApp)
+def mount_websocket(request):
+    return app.WebsocketApp()
 
 
 # Trying to defer all links, but this does not seem to work.

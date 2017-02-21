@@ -1,5 +1,6 @@
 import logging
 
+import morepath
 from more.transaction import TransactionApp
 
 log = logging.getLogger(__name__)
@@ -17,9 +18,10 @@ class ResourceApp(TransactionApp):
 
 class RootApp(ResourceApp):
 
-    def __init__(self, root):
+    def __init__(self, root, redis):
         self.db = root
         self.id = root.id
+        self.redis = redis
 
 
 class SaladsApp(ResourceApp):
@@ -34,6 +36,12 @@ class IngredientsApp(ResourceApp):
     def __init__(self, parent):
         super().__init__(parent)
         self.db = self.parent.ingredients
+
+
+class WebsocketApp(morepath.App):
+    """A App pointing to the websocket endpoints."""
+
+    pass
 
 
 App = RootApp

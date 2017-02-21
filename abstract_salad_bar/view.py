@@ -25,12 +25,17 @@ def view_json_resource(self, request):
                              body_model=model.Document)
 def create_document(self, request):
     resource = self.add(request.body_obj)
+    # TODO Add after function which will be save the object file to redis if
+    # post was successfull.
     return request.view(resource)
 
 
 # TODO move to path.
 # Load and dump json
 
+@app_module.ResourceApp.defer_links(model=model.Websocket)
+def defer_websocket_links(app, obj):
+    return app.child(app_module.WebsocketApp())
 
 
 @app_module.RootApp.defer_links(model=model.SaladCollection)
