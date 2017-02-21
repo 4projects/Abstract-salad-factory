@@ -8,19 +8,18 @@ import persistent
 import shortuuid
 
 
-log = logging.getLogger(__name__)
-
-
 class Resource(object):
 
     schema_type = 'Thing'
 
-    def dump_json(self, request):
+    def dump_json(self, request, root=True):
         json = {
             '@type': self.schema_type,
             '@id': request.link(self)
         }
-        json.update({'@context': 'http://schema.org'})
+        if root:
+            # Only add the context if this is a root object.
+            json.update({'@context': 'http://schema.org'})
         return json
 
     @classmethod
@@ -41,10 +40,17 @@ class DocumentCollection(BTree, Resource):
 
     schema_type = 'ItemList'
 
-    def dump_json(self, request):
-        if request.params.get('full'):
+    def dump_json(self, request, root=True):
+        """Dump the json of a DocumentCollection.
+
+        If full is in parameters we also dump all children.
+        root indicates if this is the root object to be json dumped,
+        children objects should have root set to false.
+        """
+        if request.params.get('full') or \
+                (root and request.params.get('children')):
             def item_function(document):
-                return request.app._dump_json(document, request)
+                return document.dump_json(request, False)
         else:
             def item_function(document):
                 return {
@@ -54,7 +60,7 @@ class DocumentCollection(BTree, Resource):
         json = {
             'itemListElement': [item_function(v) for v in self.values()],
         }
-        json.update(super().dump_json(request))
+        json.update(super().dump_json(request, root))
         return json
 
 
@@ -76,6 +82,7 @@ class Document(persistent.Persistent, Resource):
 
     @classmethod
     def is_valid_json(cls, json):
+        log = logging.getLogger(__name__)
         log.debug('Validating abject of type [ %s ]', cls.__name__)
         schema_type = json.get('@type', json.get('type', ''))
         if schema_type.lower() != cls.schema_type.lower():
@@ -88,12 +95,19 @@ class Document(persistent.Persistent, Resource):
     def load_json(cls, json, request=None):
         return super(Document, cls).load_json(json, request)
 
-    def dump_json(self, request):
-        return super().dump_json(request)
+    def dump_json(self, request, root=True):
+        return super().dump_json(request, root)
 
-    def _dump_json_attr(self, attribute, request):
-        return {'@id': request.link(self, attribute),
-                '@type': getattr(self, attribute).schema_type}
+    def _dump_json_attr(self, attribute, request, root):
+        # If full parameter is set or, if children parameter is set and
+        # this is the root object return whole attribute, not just a
+        # reference.
+        if request.params.get('full') or \
+                (root and request.params.get('children')):
+            return getattr(self, attribute).dump_json(request, False)
+        else:
+            return {'@id': request.link(self, attribute),
+                    '@type': getattr(self, attribute).schema_type}
 
 
 class SaladDocument(Document):
@@ -117,6 +131,7 @@ class SaladDocument(Document):
 
     @classmethod
     def is_valid_json(cls, json):
+        log = logging.getLogger(__name__)
         if not super().is_valid_json(json):
             return False
         date = json.get('startDate')
@@ -136,13 +151,13 @@ class SaladDocument(Document):
                        location=json.get('location', '').strip() or None)
         return super(SaladDocument, cls).load_json(json, request)
 
-    def dump_json(self, request):
+    def dump_json(self, request, root=True):
         json = {
             'startDate': self.start_time.isoformat(),
             'location': self.location,
-            'ingredients': self._dump_json_attr('ingredients', request)
+            'ingredients': self._dump_json_attr('ingredients', request, root)
         }
-        json.update(super().dump_json(request))
+        json.update(super().dump_json(request, root))
         return json
 
 
@@ -175,7 +190,7 @@ class IngredientDocument(Document):
                        owner=json['seller'].strip())
         return super(IngredientDocument, cls).load_json(json, request)
 
-    def dump_json(self, request):
+    def dump_json(self, request, root=True):
         json = {
             'seller': {
                 '@type': 'Person',
@@ -186,7 +201,7 @@ class IngredientDocument(Document):
                 'name': self.name,
             }
         }
-        json.update(super().dump_json(request))
+        json.update(super().dump_json(request, root))
         return json
 
 
@@ -202,14 +217,19 @@ class RootDocument(Document):
         super().__init__()
         self.salads = SaladCollection(self)
 
-    def dump_json(self, request):
+    def dump_json(self, request, root=True):
         json = {
-            'salads': {
-                '@id': request.link(self.salads),
-                '@type': self.salads.schema_type,
-            }
+            'salads': self._dump_json_attr('salads', request, root),
+            'websocket': {
+                '@type': 'url',
+                '@value': request.link(Websocket())
+            },
         }
-        json.update(super().dump_json(request))
+        json.update(super().dump_json(request, root))
         return json
 
 
+class Websocket(object):
+    """A websocket, uesd to get the correct link."""
+
+    pass
