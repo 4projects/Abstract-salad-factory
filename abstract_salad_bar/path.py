@@ -21,7 +21,7 @@ def get_document_path(request, id):
 
 @app.WebsocketApp.path(model=model.Websocket, path='')
 def get_websocket_path(request):
-    return model.Websocket()
+    return model.Websocket(None)
 
 
 @app.SaladsApp.mount(path='{id}/ingredients', app=app.IngredientsApp)

@@ -54,12 +54,12 @@ class DocumentCollection(BTree, Resource):
     def dump_json(self, request, root=True):
         """Dump the json of a DocumentCollection.
 
-        If full is in parameters we also dump all children.
         root indicates if this is the root object to be json dumped,
         children objects should have root set to false.
         """
-        if request.params.get('full') or \
-                (root and request.params.get('children')):
+        # Do not try and show the whole tree, as this gives problems with
+        # linking to the correct children objects.
+        if root and request.params.get('children'):
             def item_function(document):
                 return document.dump_json(request, False)
         else:
@@ -70,11 +70,14 @@ class DocumentCollection(BTree, Resource):
                 }
         json = {
             'itemListElement': [item_function(v) for v in self.values()],
-            'websocket': {
-                '@type': 'url',
-                '@value': request.link(self, 'ws')
-            },
         }
+        if root:
+            json.update({
+                'websocket': {
+                    '@type': 'url',
+                    '@value': request.link(Websocket(self))
+                },
+            })
         json.update(super().dump_json(request, root))
         return json
 
@@ -115,11 +118,10 @@ class Document(persistent.Persistent, Resource):
         return super().dump_json(request, root)
 
     def _dump_json_attr(self, attribute, request, root):
-        # If full parameter is set or, if children parameter is set and
+        # If if children parameter is set and
         # this is the root object return whole attribute, not just a
         # reference.
-        if request.params.get('full') or \
-                (root and request.params.get('children')):
+        if root and request.params.get('children'):
             return getattr(self, attribute).dump_json(request, False)
         else:
             return {'@id': request.link(self, attribute),
@@ -238,7 +240,7 @@ class RootDocument(Document):
             'salads': self._dump_json_attr('salads', request, root),
             'websocket': {
                 '@type': 'url',
-                '@value': request.link(Websocket())
+                '@value': request.link(Websocket(self))
             },
         }
         json.update(super().dump_json(request, root))
@@ -248,4 +250,5 @@ class RootDocument(Document):
 class Websocket(object):
     """A websocket, uesd to get the correct link."""
 
-    pass
+    def __init__(self, parent):
+        self.parent = parent

@@ -4,8 +4,6 @@ from . import app as app_module
 from . import model
 
 
-log = logging.getLogger(__name__)
-
 
 # @app_module.App.view(model=model.Root)
 # def view_root(self, request):
@@ -31,21 +29,19 @@ def create_document(self, request):
 
 
 # TODO move to path.
-# Load and dump json
 
 @app_module.ResourceApp.defer_links(model=model.Websocket)
 def defer_websocket_links(app, obj):
-    return app.child(app_module.WebsocketApp())
+    log = logging.getLogger(__name__)
+    log.debug('defering obj %r in app %r.', obj, app)
+    return app.child(app_module.WebsocketApp(obj))
 
 
 @app_module.RootApp.defer_links(model=model.SaladCollection)
 def defer_salad_collection_links(app, obj):
+    log = logging.getLogger(__name__)
+    log.debug('defering obj %r in app %r.', obj, app)
     return app.child(app_module.SaladsApp(obj.parent))
-
-
-@app_module.SaladsApp.defer_links(model=model.IngredientCollection)
-def defer_ingredient_collection_links(app, obj):
-    return app.child(app_module.IngredientsApp(obj.parent))
 
 
 @app_module.ResourceApp.dump_json(model=model.Resource)
