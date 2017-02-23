@@ -21,7 +21,7 @@ from .static import get_static
 def run():
     load_config()
     log = logging.getLogger(__name__)
-    db_uri = config['db'].get()
+    db_uri = config['db_uri'].get()
 
     # The morepath scan code
     morepath.autoscan()
