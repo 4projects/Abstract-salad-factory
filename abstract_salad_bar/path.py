@@ -4,7 +4,6 @@ from . import app
 from . import model
 
 
-
 @app.RootApp.path(model=model.RootDocument, path='')
 def get_root_path(request):
     return request.app.db
@@ -43,8 +42,8 @@ def mount_websocket(request):
     return app.WebsocketApp()
 
 
-# Trying to defer all links, but this does not seem to work.
-# @app.SaladsApp.defer_links(model=model.IngredientCollection)
-# def defer_ingredients(app, obj):
-#     print(obj)
-#     return app.child(app.IngredientsApp(obj))
+@app.WebsocketApp.link_prefix()
+def websocket_link_prefix(request):
+    log = logging.getLogger(__name__)
+    log.debug('Linking websocket')
+    return "http://websocket.nl"
