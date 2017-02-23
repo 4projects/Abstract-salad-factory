@@ -8,7 +8,18 @@ import persistent
 import shortuuid
 
 
+def log():
+    """Logger, is loaded on first use.
+
+    Thus we make sure it is loaded after our config is loaded.
+    """
+    return logging.getLogger(__name__)
+
+
 class Resource(object):
+
+    def __init__(self):
+        pass
 
     schema_type = 'Thing'
 
@@ -31,8 +42,8 @@ class DocumentCollection(BTree, Resource):
 
     # schema itemList
     def __init__(self, parent):
-        self.parent = parent
         super().__init__()
+        self.parent = parent
 
     def add(self, obj):
         self[obj.id] = obj
@@ -59,6 +70,10 @@ class DocumentCollection(BTree, Resource):
                 }
         json = {
             'itemListElement': [item_function(v) for v in self.values()],
+            'websocket': {
+                '@type': 'url',
+                '@value': request.link(self, 'ws')
+            },
         }
         json.update(super().dump_json(request, root))
         return json
@@ -78,6 +93,7 @@ class CommentCollection(DocumentCollection):
 
 class Document(persistent.Persistent, Resource):
     def __init__(self):
+        super().__init__()
         self.id = shortuuid.uuid()
 
     @classmethod
