@@ -64,7 +64,7 @@ def get_static(app, tempdir):
         if peek == 'api':
             log.debug('Going into api')
             request.path_info_pop()
-            log.debug(request.path_info)
+            log.debug('Path in api: %r', request.path_info)
             handler = create_handler(app)
         elif peek.replace('_', '-').lower() in \
                 locale.LocaleApp.known_languages:
