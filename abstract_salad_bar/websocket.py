@@ -150,16 +150,18 @@ class PubSub(object):
             await asyncio.sleep(0.1)
 
     async def producer(self):
-        message = await self.get_redis_message()
-        self.log.debug('the message %s', message)
-        function = message['type']
-        response = {'function': function,
-                    'path': message['channel'].decode('utf-8')}
+        r_message = await self.get_redis_message()
+        self.log.debug('Message from redis server: %s', r_message)
+        function = r_message['type']
+        w_message = {'function': function,
+                     'path': r_message['channel'].decode('utf-8')}
         if function == 'message':
-            data = json.loads(message['data'])
-            response.update({'data': data['data'],
+            data = json.loads(r_message['data'].decode('utf-8'))
+            w_message.update({'data': data['data'],
                              'type': data['type']})
-        await self.websocket.send(json.dumps(response))
+        self.log.debug('Message send over webscoket: %s',
+                       w_message)
+        await self.websocket.send(json.dumps(w_message))
 
 
 def parse_path(path):
