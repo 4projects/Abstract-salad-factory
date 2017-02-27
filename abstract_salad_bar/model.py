@@ -75,7 +75,9 @@ class DocumentCollection(BTree, Resource):
             json.update({
                 'websocket': {
                     '@type': 'url',
-                    '@value': request.link(Websocket(self))
+                    '@value': request.link(Websocket(self)).
+                    # Temporary solution, till link_prefix works.
+                    replace('http', 'ws').replace('5000', '8080')
                 },
             })
         json.update(super().dump_json(request, root))
