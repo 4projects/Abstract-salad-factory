@@ -24,4 +24,5 @@ log:
     loggers:
         abstract_salad_bar:
             level: DEBUG
-            handlers: [console]
+    root:
+        handlers: [console]
