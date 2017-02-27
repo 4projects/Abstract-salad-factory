@@ -78,7 +78,7 @@ function getIngredients(salad) {
         url: url,
         dataType: "json",
         success: showIngredients,
-        data: {full: true},
+        data: {children: true},
     });
 };
 
