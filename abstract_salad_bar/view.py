@@ -1,8 +1,8 @@
+import json
 import logging
 
 from . import app as app_module
 from . import model
-
 
 
 # @app_module.App.view(model=model.Root)
@@ -22,9 +22,17 @@ def view_json_resource(self, request):
                              request_method='POST',
                              body_model=model.Document)
 def create_document(self, request):
+    log = logging.getLogger(__name__)
     resource = self.add(request.body_obj)
-    # TODO Add after function which will be save the object file to redis if
-    # post was successfull.
+
+    def redis_publish(response):
+        # After function which will be save the object file to
+        # redis if post was successfull.
+        log.debug('Publishing obj %r to redis', resource)
+        data = {'data': resource.dump_json(request),
+                'type': 'CREATE'}
+        request.app.root.redis.publish(request.path, json.dumps(data))
+    request.after(redis_publish)
     return request.view(resource)
 
 
