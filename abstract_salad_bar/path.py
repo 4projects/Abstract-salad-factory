@@ -1,7 +1,10 @@
 import logging
 
 from . import app
+from .config import config
 from . import model
+
+import webob
 
 
 @app.RootApp.path(model=model.RootDocument, path='')
@@ -46,4 +49,17 @@ def mount_websocket(request):
 def websocket_link_prefix(request):
     log = logging.getLogger(__name__)
     log.debug('Linking websocket')
-    return "http://websocket.nl"
+    # Create a new request object which we will use to set the right
+    # values for our websocket settings.
+    request = webob.Request(request.environ.copy())
+    if request.scheme.endswith('s'):
+        request.scheme = 'wss'
+    else:
+        request.scheme = 'ws'
+    # request.host_port is a string so compare to a string.
+    if request.host_port == str(config['port'].get()):
+        # We can only set the request.host value, so take the domain
+        # and the new websocket port to create the new host.
+        request.host = '{}:{}'.format(request.domain,
+                                      config['websocket']['port'].get())
+    return request.application_url
