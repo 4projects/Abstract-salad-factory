@@ -62,10 +62,15 @@ function postIngredient(url) {
             data: JSON.stringify(data),
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            success: showIngredient,
+            success: addIngredient,
         });
     };
 };
+
+function addIngredient(data) {
+    // TODO Save ingredient to local storage, so we know it is ours.
+    showIngredient(data)
+}
 
 function getIngredients(salad) {
     var url = salad["ingredients"]["@id"];
@@ -77,18 +82,46 @@ function getIngredients(salad) {
     });
 };
 
+function websocketIngredients(data) {
+    // 1 connect to websocket
+    var url = data["websocket"]["@value"]
+    // 2 Already subscribed to path.
+    var ws = new WebSocket(url);
+    // add ingredient on message
+    ws.addEventListener("message",
+        function (event) {
+            parseWebsocketIngredientMessage(event.data)
+        });
+}
+
+function parseWebsocketIngredientMessage(data) {
+    data = JSON.parse(data)
+    console.log("Message from server", data);
+    console.log(data["function"])
+    if (data["function"] == "message" && data["type"] == "CREATE") {
+        showIngredient(data["data"])
+    }
+}
+
 function showIngredients(data) {
+    websocketIngredients(data);
     for (let ingredient of data["itemListElement"]) {
         showIngredient(ingredient);
     };
 };
 
 function showIngredient(data) {
-    var row = $("<tr>");
-    row.append($("<td>").addClass("uk-text-truncate").text(data["itemOffered"]["name"]));
-    row.append($("<td>").addClass("uk-text-truncate").text(data["seller"]["name"]));
-    row.append($("<td>"));
-    $("#ingredients tbody").append(row);
+    // Add ingredient to list of ingredients.
+    var table = $("#ingredients tbody")
+    var id = getId(data["@id"])
+    // Only add ingredienten if it is not in the list yet.
+    if (table.children("#" + id).length == 0) {
+        var row = $("<tr>").attr("id", id);
+        row.append($("<td>").addClass("uk-text-truncate").text(data["itemOffered"]["name"]));
+        row.append($("<td>").addClass("uk-text-truncate").text(data["seller"]["name"]));
+        row.append($("<td>"));
+        table.append(row);
+    }
     // Focus on input.
     $("#salad input[name=name]")[0].focus();
 };
