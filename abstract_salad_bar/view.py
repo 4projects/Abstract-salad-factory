@@ -42,7 +42,7 @@ def create_document(self, request):
 def defer_websocket_links(app, obj):
     log = logging.getLogger(__name__)
     log.debug('defering obj %r in app %r.', obj, app)
-    return app.child(app_module.WebsocketApp(obj))
+    return app.child(app_module.WebsocketApp())
 
 
 @app_module.RootApp.defer_links(model=model.SaladCollection)
