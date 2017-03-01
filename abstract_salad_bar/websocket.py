@@ -5,6 +5,8 @@ import logging
 from urllib import parse
 
 import redis
+from redis.client import PubSub
+
 import requests
 
 import websockets
@@ -12,24 +14,52 @@ import websockets
 from .config import config, load_config
 
 
-class PubSub(object):
+class AsyncPubSub(PubSub):
+    """Adds an async listener to the default redis PubSub."""
 
-    _redis_pool = None
+    async def listen(self):
+        """Listen for a message in async."""
+        while True:
+            message = super().get_message()
+            if message:
+                return message
+            # Async sleep before next check.
+            await asyncio.sleep(0.1)
+
+
+def handler_factory(pubsub_class, *args, **kwargs):
+    """Create a async handler for the websocket server.
+
+    This allows for setting the pubsub class (usefull for testing).
+    """
+    log = logging.getLogger(__name__)
+
+    async def handler(websocket, path):
+        """Async websocket handler."""
+        log.debug('Creating new websocket.')
+        pubsub = pubsub_class(*args, **kwargs)
+        with WebSocketHandler(websocket, path, pubsub) as self:
+            await self.handle()
+
+    return handler
+
+
+class WebSocketHandler(object):
+    """WebSocket handler.
+
+    One is created for every websocket connection.
+    """
+
     functions = ('ls', 'subscribe', 'unsubscribe')
-    log = None
 
-    def __init__(self, websocket, path):
-        if not self.log:
-            self.log = logging.getLogger(__name__)
+    def __init__(self, websocket, path, pubsub):
+        self.log = logging.getLogger(__name__)
         self.log.debug('init')
         self.log.debug('websocket path: %s', path)
         self.websocket = websocket
         self.subscriptions = set()
         # Redis connect, make sure we have a pool.
-        self._redis = redis.StrictRedis(
-            connection_pool=self.get_redis_pool()
-        )
-        self.p = self._redis.pubsub()
+        self.pubsub = pubsub
         path = path.rstrip('/')
         if path.endswith('/ws'):
             path = path[:-3]
@@ -42,33 +72,17 @@ class PubSub(object):
             )
         self.log.debug('init done')
 
-    @classmethod
-    def get_redis_pool(cls):
-        """Create and reuse a redis pool."""
-        if cls._redis_pool is None:
-            cls._redis_pool = redis.ConnectionPool.from_url(
-                config['redis_uri'].get()
-            )
-        return cls._redis_pool
-
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         try:
-            self.p.unsubscribe()
+            self.pubsub.unsubscribe()
         except Exception as e:
             self.log.Exception('Clean-up failed: %s', e)
         if exc_val:
             self.log.Exception('Websocket handling failed: %s', exc_val,
                                exc_info=(exc_type, exc_val, exc_tb))
-
-    @classmethod
-    async def create(cls, websocket, path):
-        cls.log = logging.getLogger(__name__)
-        cls.log.debug('Creating new websocket.')
-        with cls(websocket, path) as self:
-            await self.handle()
 
     async def handle(self):
         self.log.debug('handlingen')
@@ -135,8 +149,7 @@ class PubSub(object):
                 ))
                 return
             self.log.debug('Subscribing to path: %s', path)
-            # TODO check that path really exists.
-            self.p.subscribe(path)
+            self.pubsub.subscribe(path)
             self.subscriptions.add(path)
         else:
             await self.websocket.send(json.dumps(
@@ -146,22 +159,15 @@ class PubSub(object):
     async def unsubscribe(self, message):
         path = parse_path(message['path'])
         if path in self.subscriptions:
-            self.p.unsubscribe(path)
+            self.pubsub.unsubscribe(path)
             self.subscriptions.remove(path)
         else:
             await self.websocket.send(json.dumps(
                 {'error': 'Not subscribed to path: {}'.format(path)}
             ))
 
-    async def get_redis_message(self):
-        while True:
-            message = self.p.get_message()
-            if message:
-                return message
-            await asyncio.sleep(0.1)
-
     async def producer(self):
-        r_message = await self.get_redis_message()
+        r_message = await self.pubsub.listen()
         self.log.debug('Message from redis server: %s', r_message)
         function = r_message['type']
         w_message = {'function': function,
@@ -205,9 +211,15 @@ def run():
     log = logging.getLogger(__name__)
     host = config['websocket']['host'].get()
     port = config['websocket']['port'].get()
+    # Create redis pool
+    redis_pool = redis.ConnectionPool.from_url(
+        config['redis_uri'].get()
+    )
     # Test that we can connect to redis.
-    redis.StrictRedis(connection_pool=PubSub.get_redis_pool()).get(None)
-    start_server = websockets.serve(PubSub.create, host=host, port=port)
+    redis.StrictRedis(connection_pool=redis_pool).ping()
+    # Set redis pool as the PubSub class redis pool.
+    handler = handler_factory(AsyncPubSub, connection_pool=redis_pool)
+    start_server = websockets.serve(handler, host=host, port=port)
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(start_server)

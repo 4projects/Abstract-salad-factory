@@ -43,7 +43,7 @@ def run():
     # Redis connection
     r = StrictRedis.from_url(config['redis_uri'].get())
     # Test that we can connect tot the redis instance.
-    r.get(None)
+    r.ping()
 
     app = App(root, r)
 
