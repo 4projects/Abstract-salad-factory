@@ -88,6 +88,7 @@ function websocketIngredients(data) {
     // 2 Already subscribed to path.
     var ws = new WebSocket(url);
     // add ingredient on message
+    console.log("Connected to", ws)
     ws.addEventListener("message",
         function (event) {
             parseWebsocketIngredientMessage(event.data)
