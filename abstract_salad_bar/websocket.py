@@ -5,6 +5,7 @@ import logging
 from urllib import parse
 
 import redis
+import requests
 
 import websockets
 
@@ -32,6 +33,9 @@ class PubSub(object):
         path = path.rstrip('/')
         if path.endswith('/ws'):
             path = path[:-3]
+        if not is_valid_app_path(path):
+            # If path is invalid, close connection.
+            websocket.close(4000, 'Invalid path.')
         if path:
             asyncio.ensure_future(
                 self.subscribe({'path': path})
@@ -123,6 +127,13 @@ class PubSub(object):
         # redis subscribe
         path = parse_path(message['path'])
         if path not in self.subscriptions:
+            if not is_valid_app_path(path):
+                # If path is not valid, send en error message and
+                # do not subscribe to it.
+                await self.websocket.send(json.dumps(
+                    {'error': 'Invalid path: {}'.format(path)}
+                ))
+                return
             self.log.debug('Subscribing to path: %s', path)
             # TODO check that path really exists.
             self.p.subscribe(path)
@@ -170,6 +181,23 @@ def parse_path(path):
     # start with http(s)//.
     url = parse.urlparse(path)
     return url.path
+
+
+def is_valid_app_path(path):
+    """Check that the path is a existing app path."""
+    # Path must start with 'api'.
+    log = logging.getLogger(__name__)
+    log.debug('Testing path %r', path)
+    if path.lstrip('/').startswith('/api'):
+        url = 'http://{host}:{port}/{path}'.format(host=config['host'].get(),
+                                                   port=config['port'].get(),
+                                                   path=path.lstrip('/'))
+        # Use a local connection to try and connect to this url.
+        response = requests.get(url)
+        # If connection is succesful (status code lower than 400 or higher
+        # than 599 return True.
+        return not 400 <= response.status_code < 600
+    return False
 
 
 def run():
