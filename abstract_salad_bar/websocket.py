@@ -62,6 +62,10 @@ class WebSocketHandler(object):
         self._loop = loop
         self.log.debug('websocket path: %s', path)
         self.websocket = websocket
+        self.log.debug('Websocket headers: %s',
+                       self.websocket.request_headers)
+        self.origin = self.websocket.request_headers['origin'] or ''
+        self.log.debug('Origin: %r', self.origin)
         self.subscriptions = set()
         # Redis connect, make sure we have a pool.
         self.pubsub = pubsub
@@ -146,7 +150,7 @@ class WebSocketHandler(object):
 
     async def subscribe(self, message):
         # redis subscribe
-        path = parse_path(message['path'])
+        path = parse_path(message['path'], self.origin)
         if path not in self.subscriptions:
             if not is_valid_app_path(path):
                 # If path is not valid, send en error message and
@@ -164,7 +168,7 @@ class WebSocketHandler(object):
             ))
 
     async def unsubscribe(self, message):
-        path = parse_path(message['path'])
+        path = parse_path(message['path'], self.origin)
         if path in self.subscriptions:
             self.pubsub.unsubscribe(path)
             self.subscriptions.remove(path)
@@ -188,12 +192,31 @@ class WebSocketHandler(object):
         await self.websocket.send(json.dumps(w_message))
 
 
-def parse_path(path):
-    """Only return the path part of an url."""
-    # TODO this will not really work yet if link does not
-    # start with http(s)//.
-    url = parse.urlparse(path)
-    return url.path
+def parse_path(path, origin):
+    """Only return the path part of an url.
+
+    Path may be only the path part of the url or an url starting with
+    origin.
+    All paths are returned as an absolute path. Any ending slashes are
+    removed.
+    """
+    log = logging.getLogger(__name__)
+    origin = parse.urlparse(origin)
+    log.debug('url parse origin: %r', origin)
+    # Remove any slashes at the start and end of the path.
+    path = path.strip('/')
+    # Define the scheme.
+    scheme = '{}://'.format(origin.scheme)
+    # Add the scheme and netloc to the path if it did not contain it already.
+    if not path.startswith(scheme):
+        if not path.startswith(origin.netloc):
+            path = '{}/{}'.format(origin.netloc, path)
+        path = '{}{}'.format(scheme, path)
+    # Now get the path part of the url, and again strip any slashes.
+    path = parse.urlparse(path).path.strip('/')
+    # Readd a slash at the beginning.
+    path = '/{}'.format(path)
+    return path
 
 
 def is_valid_app_path(path):
