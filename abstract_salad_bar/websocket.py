@@ -90,10 +90,10 @@ class WebSocketHandler(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         try:
             self.pubsub.unsubscribe()
-        except Exception as e:
-            self.log.Exception('Clean-up failed: %s', e)
-        if exc_val:
-            self.log.Exception('Websocket handling failed: %s', exc_val,
+        except Exception as e:  # pragma: no cover
+            self.log.exception('Clean-up failed: %s', e)
+        if exc_val:  # pragma: no cover
+            self.log.exception('Websocket handling failed: %s', exc_val,
                                exc_info=(exc_type, exc_val, exc_tb))
 
     async def handle(self):
