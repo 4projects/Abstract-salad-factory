@@ -17,6 +17,10 @@ from .config import config, load_config
 class AsyncPubSub(PubSub):
     """Adds an async listener to the default redis PubSub."""
 
+    def __init__(self, *, loop=None, **kwargs):
+        self._loop = loop
+        super().__init__(**kwargs)
+
     async def listen(self):
         """Listen for a message in async."""
         while True:
@@ -24,10 +28,10 @@ class AsyncPubSub(PubSub):
             if message:
                 return message
             # Async sleep before next check.
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.1, loop=self._loop)
 
 
-def handler_factory(pubsub_class, *args, **kwargs):
+def handler_factory(pubsub_class, *, loop=None, **kwargs):
     """Create a async handler for the websocket server.
 
     This allows for setting the pubsub class (usefull for testing).
@@ -37,8 +41,8 @@ def handler_factory(pubsub_class, *args, **kwargs):
     async def handler(websocket, path):
         """Async websocket handler."""
         log.debug('Creating new websocket.')
-        pubsub = pubsub_class(*args, **kwargs)
-        with WebSocketHandler(websocket, path, pubsub) as self:
+        pubsub = pubsub_class(loop=loop, **kwargs)
+        with WebSocketHandler(websocket, path, pubsub, loop=loop) as self:
             await self.handle()
 
     return handler
@@ -52,9 +56,10 @@ class WebSocketHandler(object):
 
     functions = ('ls', 'subscribe', 'unsubscribe')
 
-    def __init__(self, websocket, path, pubsub):
+    def __init__(self, websocket, path, pubsub, *, loop=None):
         self.log = logging.getLogger(__name__)
         self.log.debug('init')
+        self._loop = loop
         self.log.debug('websocket path: %s', path)
         self.websocket = websocket
         self.subscriptions = set()
@@ -65,10 +70,13 @@ class WebSocketHandler(object):
             path = path[:-3]
         if not is_valid_app_path(path):
             # If path is invalid, close connection.
-            websocket.close(4000, 'Invalid path.')
+            self.log.debug('Invalid path closing connection.')
+            asyncio.ensure_future(websocket.close(4000, 'Invalid path.'),
+                                  loop=self._loop)
         if path:
             asyncio.ensure_future(
-                self.subscribe({'path': path})
+                self.subscribe({'path': path}),
+                loop=self._loop
             )
         self.log.debug('init done')
 
@@ -86,31 +94,30 @@ class WebSocketHandler(object):
 
     async def handle(self):
         self.log.debug('handlingen')
-        while True:
-            listener_task = asyncio.ensure_future(self.websocket.recv())
-            producer_task = asyncio.ensure_future(self.producer())
-            # Wait for any of the tasks to be done.
-            await asyncio.wait(
-                [
-                    listener_task,
-                    producer_task
-                ],
-                return_when=asyncio.FIRST_COMPLETED)
-            # If they are done or cancelled, cancel() returns False
-            if not listener_task.cancel():
-                try:
-                    await self.consumer(listener_task.result())
-                except CancelledError:
-                    # Do nothing if task has been cancelled.
-                    pass
+        try:
+            while True:
+                tasks = []
+                tasks.append(asyncio.ensure_future(self.consumer(),
+                                                   loop=self._loop))
+                tasks.append(asyncio.ensure_future(self.producer(),
+                                                   loop=self._loop))
+                # Wait for any of the tasks to be done.
+                done, pending = await asyncio.wait(
+                    tasks,
+                    loop=self._loop,
+                    return_when=asyncio.FIRST_COMPLETED)
+                for task in tasks:
+                    # If they are done or cancelled, cancel() returns False
+                    if not task.cancel():
+                        task.result()
+        except (CancelledError, websockets.ConnectionClosed) as e:
+            self.log.debug('Handling exited with: %s', e, exc_info=True)
+        finally:
+            for task in tasks:
+                task.cancel()
 
-            if not producer_task.cancel():
-                try:
-                    producer_task.result()
-                except CancelledError:
-                    pass
-
-    async def consumer(self, message):
+    async def consumer(self):
+        message = await self.websocket.recv()
         self.log.debug('Got message from client: %s', message)
         try:
             message = json.loads(message)
@@ -206,7 +213,7 @@ def is_valid_app_path(path):
     return False
 
 
-def run():
+def run():  # pragma: no cover
     load_config()
     log = logging.getLogger(__name__)
     host = config['websocket']['host'].get()
@@ -217,17 +224,18 @@ def run():
     )
     # Test that we can connect to redis.
     redis.StrictRedis(connection_pool=redis_pool).ping()
-    # Set redis pool as the PubSub class redis pool.
-    handler = handler_factory(AsyncPubSub, connection_pool=redis_pool)
-    start_server = websockets.serve(handler, host=host, port=port)
-
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(start_server)
+    # Set redis pool as the PubSub class redis pool.
+    handler = handler_factory(AsyncPubSub, loop=loop,
+                              connection_pool=redis_pool)
+    server = websockets.serve(handler, host=host, port=port)
+
+    loop.run_until_complete(server)
     print('Started Websocket server at {}:{}'.format(host, port))
     log.debug('started websocket server')
     loop.run_forever()
     loop.stop()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     run()
