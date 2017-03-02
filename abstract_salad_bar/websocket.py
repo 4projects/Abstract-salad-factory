@@ -220,11 +220,15 @@ def parse_path(path, origin):
 
 
 def is_valid_app_path(path):
-    """Check that the path is a existing app path."""
+    """Check that the path is a existing app path.
+
+    App paths shoud always start with "api" and should not return an
+    http error status.
+    """
     # Path must start with 'api'.
     log = logging.getLogger(__name__)
     log.debug('Testing path %r', path)
-    if path.lstrip('/').startswith('/api'):
+    if path.lstrip('/').startswith('api'):
         url = 'http://{host}:{port}/{path}'.format(host=config['host'].get(),
                                                    port=config['port'].get(),
                                                    path=path.lstrip('/'))
@@ -233,6 +237,8 @@ def is_valid_app_path(path):
         # If connection is succesful (status code lower than 400 or higher
         # than 599 return True.
         return not 400 <= response.status_code < 600
+    else:
+        log.debug('Path must start with "api" to be valid.')
     return False
 
 
