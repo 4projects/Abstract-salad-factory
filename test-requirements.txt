@@ -1,0 +1,5 @@
+tox
+pytest
+pytest-asyncio
+pytest-catchlog
+requests-mock

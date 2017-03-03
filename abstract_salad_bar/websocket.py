@@ -4,8 +4,8 @@ import json
 import logging
 from urllib import parse
 
-import redis
-from redis.client import PubSub
+import aredis
+from aredis.pubsub import PubSub
 
 import requests
 
@@ -14,36 +14,24 @@ import websockets
 from .config import config, load_config
 
 
-class AsyncPubSub(PubSub):
-    """Adds an async listener to the default redis PubSub."""
-
-    def __init__(self, *, loop=None, **kwargs):
-        self._loop = loop
-        super().__init__(**kwargs)
-
-    async def listen(self):
-        """Listen for a message in async."""
-        while True:
-            message = super().get_message()
-            if message:
-                return message
-            # Async sleep before next check.
-            await asyncio.sleep(0.1, loop=self._loop)
-
-
-def handler_factory(pubsub_class, *, loop=None, **kwargs):
+def handler_factory(pubsub_class, pubsub_kwargs=None, *, loop=None):
     """Create a async handler for the websocket server.
 
     This allows for setting the pubsub class (usefull for testing).
     """
     log = logging.getLogger(__name__)
+    if not pubsub_kwargs:  # pragma: no cover
+        pubsub_kwargs = {}
+    pubsub = pubsub_class(**pubsub_kwargs)
 
     async def handler(websocket, path):
         """Async websocket handler."""
         log.debug('Creating new websocket.')
-        pubsub = pubsub_class(loop=loop, **kwargs)
         with WebSocketHandler(websocket, path, pubsub, loop=loop) as self:
             await self.handle()
+
+    # Save the pubsub as a hidden variable used in testing.
+    handler._pubsub = pubsub
 
     return handler
 
@@ -75,9 +63,11 @@ class WebSocketHandler(object):
         if not is_valid_app_path(path):
             # If path is invalid, close connection.
             self.log.debug('Invalid path closing connection.')
-            asyncio.ensure_future(websocket.close(4000, 'Invalid path.'),
+            asyncio.ensure_future(websocket.close(4004, 'Invalid path'),
                                   loop=self._loop)
-        if path:
+            return
+        # Don't try to subscribe to the main '/api' url.
+        if path != '/api':
             asyncio.ensure_future(
                 self.subscribe({'path': path}),
                 loop=self._loop
@@ -89,12 +79,24 @@ class WebSocketHandler(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         try:
-            self.pubsub.unsubscribe()
+            asyncio.wait_for(
+                asyncio.ensure_future(
+                    self.pubsub.unsubscribe(), loop=self._loop
+                ),
+                0, loop=self._loop
+            )
         except Exception as e:  # pragma: no cover
             self.log.exception('Clean-up failed: %s', e)
-        if exc_val:  # pragma: no cover
-            self.log.exception('Websocket handling failed: %s', exc_val,
+        if exc_type:
+            if issubclass(exc_type,
+                          (CancelledError, websockets.ConnectionClosed)):
+                # We can ignore CancelledError and ConnectionClosed errors.
+                self.log.debug('Handling exited with: %s', exc_val,
                                exc_info=(exc_type, exc_val, exc_tb))
+                return True
+            else:  # pragma: no cover
+                self.log.exception('Websocket handling failed: %s', exc_type,
+                                   exc_info=(exc_type, exc_val, exc_tb))
 
     async def handle(self):
         self.log.debug('handlingen')
@@ -114,8 +116,6 @@ class WebSocketHandler(object):
                     # If they are done or cancelled, cancel() returns False
                     if not task.cancel():
                         task.result()
-        except (CancelledError, websockets.ConnectionClosed) as e:
-            self.log.debug('Handling exited with: %s', e, exc_info=True)
         finally:
             for task in tasks:
                 task.cancel()
@@ -138,19 +138,28 @@ class WebSocketHandler(object):
         function = message.get('function')
         if function not in self.functions:
             await self.websocket.send(json.dumps(
-                {'error': 'function must be one of: {}.'.
+                {'error': 'Message function must be one of: {}.'.
                  format(', '.join(self.functions))}
             ))
             return
         self.log.debug('Running function %s', function)
+        if function in ('subscribe', 'unsubscribe'):
+            if 'path' not in message:
+                await self.websocket.send(json.dumps(
+                    {'error': 'Message missing path.'}
+                ))
+                return
         await getattr(self, function)(message)
 
     async def ls(self, message):
-        await self.websocket.send(json.dumps(sorted(self.subscriptions)))
+        message = {'function': 'ls',
+                   'paths': sorted(self.subscriptions)}
+        await self.websocket.send(json.dumps(message))
 
     async def subscribe(self, message):
         # redis subscribe
-        path = parse_path(message['path'], self.origin)
+        path = message['path']
+        path = parse_path(path, self.origin)
         if path not in self.subscriptions:
             if not is_valid_app_path(path):
                 # If path is not valid, send en error message and
@@ -160,25 +169,30 @@ class WebSocketHandler(object):
                 ))
                 return
             self.log.debug('Subscribing to path: %s', path)
-            self.pubsub.subscribe(path)
+            await self.pubsub.subscribe(path)
             self.subscriptions.add(path)
         else:
             await self.websocket.send(json.dumps(
-                {'error': 'Already subscribed to path: {}'.format(path)}
+                {'function': 'subscribe',
+                 'error': 'Already subscribed to path: {}'.format(path)}
             ))
 
     async def unsubscribe(self, message):
-        path = parse_path(message['path'], self.origin)
+        path = message['path']
+        path = parse_path(path, self.origin)
         if path in self.subscriptions:
-            self.pubsub.unsubscribe(path)
+            await self.pubsub.unsubscribe(path)
             self.subscriptions.remove(path)
         else:
             await self.websocket.send(json.dumps(
-                {'error': 'Not subscribed to path: {}'.format(path)}
+                {'function': 'unsubscribe',
+                 'error': 'Not subscribed to path: {}'.format(path)}
             ))
 
     async def producer(self):
         r_message = await self.pubsub.listen()
+        if not r_message:
+            return
         self.log.debug('Message from redis server: %s', r_message)
         function = r_message['type']
         w_message = {'function': function,
@@ -245,18 +259,25 @@ def is_valid_app_path(path):
 def run():  # pragma: no cover
     load_config()
     log = logging.getLogger(__name__)
+    loop = asyncio.get_event_loop()
     host = config['websocket']['host'].get()
     port = config['websocket']['port'].get()
     # Create redis pool
-    redis_pool = redis.ConnectionPool.from_url(
+    redis_pool = aredis.ConnectionPool.from_url(
         config['redis_uri'].get()
     )
-    # Test that we can connect to redis.
-    redis.StrictRedis(connection_pool=redis_pool).ping()
-    loop = asyncio.get_event_loop()
+    # Test that we can connect to redis. # TODO not working with aredis
+    asyncio.wait_for(
+        asyncio.ensure_future(
+            aredis.StrictRedis(connection_pool=redis_pool).ping(),
+            loop=loop
+        ),
+        0, loop=loop
+    )
     # Set redis pool as the PubSub class redis pool.
-    handler = handler_factory(AsyncPubSub, loop=loop,
-                              connection_pool=redis_pool)
+    handler = handler_factory(PubSub,
+                              {'connection_pool': redis_pool},
+                              loop=loop)
     server = websockets.serve(handler, host=host, port=port)
 
     loop.run_until_complete(server)

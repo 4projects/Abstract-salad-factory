@@ -1,4 +1,7 @@
 import asyncio
+from functools import partial
+import json
+import logging
 import re
 
 import pytest
@@ -60,19 +63,55 @@ class Client:
         self._loop = loop
         if not self._loop:  # pragma: no cover
             self._loop = asyncio.get_event_loop()
-        self.client = None
+        self._running = False
 
     def start(self, url, origin, **kwargs):
+        if self._running:  # pragma: no cover
+            return
+        self._running = True
         client = websockets.connect(url, loop=self._loop, origin=origin,
                                     **kwargs)
         self.client = self._loop.run_until_complete(client)
-        return self.client
+        return self
 
-    def __call__(self, *args, **kwargs):
+    def sync_ping(self, data=None, *, timeout=1):
+        return self._loop.run_until_complete(
+            asyncio.wait_for(self.ping(data), timeout,
+                             loop=self._loop)
+        )
+
+    async def ping(self, data=None):
+        return await self.client.ping(data)
+
+    def sync_send(self, message, *, timeout=1):
+        return self._loop.run_until_complete(
+            asyncio.wait_for(self.send(message), timeout,
+                             loop=self._loop)
+        )
+
+    def sync_recv(self, *, timeout=1):
+        return self._loop.run_until_complete(
+            asyncio.wait_for(self.recv(), timeout,
+                             loop=self._loop)
+        )
+
+    async def send(self, message):
+        return await self.client.send(message)
+
+    async def recv(self):
+        return await self.client.recv()
+
+    @property
+    def open(self):
+        if not self._running:  # pragma: no cover
+            return False
+        return self.client.open
+
+    def __call__(self, *args, **kwargs):  # pragma: no cover
         return self.start(*args, **kwargs)
 
     def stop(self):
-        if not self.client:  # pragma: no cover
+        if not self._running:  # pragma: no cover
             return
         self._loop.run_until_complete(self.client.close())
         try:
@@ -81,14 +120,26 @@ class Client:
                                  loop=self._loop)
             )
         except asyncio.TimeoutError:  # pragma: no cover
-            pytest.fail('Client failed to stop')
+            pytest.fail('Client failed to stop.')
+        finally:
+            self._running = False
 
 
 @pytest.fixture
-def client(event_loop):
+def client(event_loop, unused_tcp_port):
+    url = 'ws://{}:{}/'.format('localhost', unused_tcp_port)
     client = Client(loop=event_loop)
-    yield client
-    client.stop()
+
+    def get_client(path='api', *, origin, **kwargs):
+        return client.start('{}{}'.format(url, path.lstrip('/')),
+                            origin, **kwargs)
+    yield get_client
+    try:
+        client.stop()
+    except websockets.ConnectionClosed as e:  # pragma: no cover
+        # The server closed the connection unexpectedly, test has failed.
+        pytest.fail('Server closed connection unexpectedly. Check logging '
+                    'for error message.\n{}'.format(e))
 
 
 class Server:
@@ -96,21 +147,26 @@ class Server:
         self._loop = loop
         if not self._loop:  # pragma: no cover
             self._loop = asyncio.get_event_loop()
-        self.server = None
+        self._running = False
 
     def start(self, host, port, pubsub_class, **kwargs):
-        handler = websocket.handler_factory(pubsub_class, loop=self._loop,
-                                            **kwargs)
+        self._running = True
+        pubsub_kwargs = kwargs
+        pubsub_kwargs['loop'] = self._loop
+        print(pubsub_kwargs)
+        handler = websocket.handler_factory(pubsub_class, pubsub_kwargs,
+                                            loop=self._loop)
         server = websockets.serve(handler, host=host, port=port,
                                   loop=self._loop)
         self.server = self._loop.run_until_complete(server)
-        return self.server
+        self.pubsub = handler._pubsub
+        return self
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs):  # pragma: no cover
         return self.start(*args, **kwargs)
 
     def stop(self):
-        if not self.server:  # pragma: no cover
+        if not self._running:  # pragma: no cover
             return
         self.server.close()
         try:
@@ -118,74 +174,192 @@ class Server:
                 asyncio.wait_for(self.server.wait_closed(), timeout=1,
                                  loop=self._loop)
             )
+            # task.result()
         except asyncio.TimeoutError:  # pragma: no cover
             pytest.fail('Server failed to stop')
+        finally:
+            self._running = False
 
 
 @pytest.fixture
-def server(event_loop):
+def server(event_loop, unused_tcp_port):
     server = Server(loop=event_loop)
-    # TODO error logs in this part should result in a failure.
-    yield server
+    yield partial(server.start, 'localhost', unused_tcp_port)
     server.stop()
 
 
-class MockPubSub(object):
-    def __init__(self, loop=None, *args, **kwargs):
+class MockAsyncPubSub(object):
+    def __init__(self, *, loop=None, **kwargs):
         self._loop = loop
-        pass
+        self._internal_queue = asyncio.Queue(loop=self._loop)
+        # This queue is can be used to get values by external programs.
+        self.queue = asyncio.Queue(loop=self._loop)
 
-    def subscribe(self, path):
-        print(path)
+    async def subscribe(self, path):
+        print('Mock subscribing to :', path)
+        message = {'type': 'subscribe',
+                   'channel': path.encode('utf-8')}
+        await self.queue.put(message)
+        await self._internal_queue.put(message)
 
-    def unsubscribe(self, path=None):
-        pass
+    async def unsubscribe(self, path=None):
+        if not path:
+            path = 'ALL'
+        print('Mock unsubscribing to :', path)
+        message = {'type': 'unsubscribe',
+                   'channel': path.encode('utf-8')}
+        await self.queue.put(message)
+        await self._internal_queue.put(message)
+
+    def send_message(self, message):
+        self._internal_queue.put_nowait(message)
 
     async def listen(self):
-        await asyncio.sleep(1, loop=self._loop)
-        return {'type': '',
-                'channel': b''}
+        message = await self._internal_queue.get()
+        print('Mock listener got message:', message)
+        return message
 
 
 class TestWebSocketHandler:
 
     host = 'localhost'
-    port = 5010
+    origin_port = 5010
 
     @property
     def origin(self):
-        return 'http://{}:{}'.format(self.host, self.port)
+        return 'http://{}:{}'.format(self.host, self.origin_port)
 
     @pytest.fixture(autouse=True)
     def mock_is_valid_path(self, config, requests_mocker):
         config['host'] = self.host
-        config['port'] = self.port
+        config['port'] = self.origin_port
         matcher = re.compile(r'^{}'.format(self.origin))
         requests_mocker.get(matcher)
 
-    def test_connect(self, unused_tcp_port, client, server):
-        host = 'localhost'
-        url = 'ws://{}:{}/api'.format(host, unused_tcp_port)
-        server = server(host, unused_tcp_port, MockPubSub)
-        client = client(url, origin=self.origin)
+    def test_connect(self,  client, server):
+        server = server(MockAsyncPubSub)
+        client = client(origin=self.origin)
         assert client.open
 
     @pytest.mark.parametrize('path', [
-        'path/',
-        'path',
-        'path/ws',
-        'path/ws/',
-        'path/hello/ws/',
-        'path/hello/ws',
-        'path/hello/',
-        'path/hello',
+        'api/path/',
+        'api/path',
+        'api/path/ws',
+        'api/path/ws/',
+        'api/path/hello/ws/',
+        'api/path/hello/ws',
+        'api/path/hello/',
+        'api/path/hello',
     ])
     def test_connect_with_path(self, unused_tcp_port, client, server, path):
-        host = 'localhost'
-        url = 'ws://{}:{}/api/{}'.format(host, unused_tcp_port, path)
-        server = server(host, unused_tcp_port, MockPubSub)
-        client = client(url, origin=self.origin)
+        server = server(MockAsyncPubSub)
+        client = client(path, origin=self.origin)
         assert client.open
 
-    # Test failing paths should close client
-    # Test that subscribe, unsubscribe and listen work.
+    @pytest.mark.parametrize('path, expected', [
+        ('api/here', '/api/here'),
+        ('api/here/', '/api/here'),
+        ('/api/here/', '/api/here'),
+        ('api/nowhere', '/api/nowhere'),
+        ('api/nowhere/ws', '/api/nowhere/ws'),
+    ])
+    def test_subscribe_ls_unsubscribe(self, client, server, path, expected):
+        server = server(MockAsyncPubSub)
+        client = client(origin=self.origin)
+        tests = [
+            ('subscribe', {'path': expected}),
+            ('subscribe', {'error':
+                           'Already subscribed to path: {}'.format(expected)}),
+            ('ls', {'paths': [expected]}),
+            ('unsubscribe', {'path': expected}),
+            ('ls', {'paths': []}),
+            ('unsubscribe', {'error':
+                             'Not subscribed to path: {}'.format(expected)}),
+            ('subscribe', {'path': expected}),
+        ]
+        for function, expected in tests:
+            message = {'function': function,
+                       'path': path}
+            message = json.dumps(message)
+            client.sync_send(message)
+            result = client.sync_recv()
+            result = json.loads(result)
+            assert result.pop('function') == function
+            assert result == expected
+
+    @pytest.mark.parametrize('data', [
+        'hello',
+    ])
+    def test_listen_for_message(self, client, server, data):
+        function = 'message'
+        type_ = 'CREATE'
+        path = '/a/path/s'
+        dt = json.dumps({'data': data, 'type': type_}).\
+            encode('utf-8')
+        m = {'channel': path.encode('utf-8'), 'type': function,
+             'data': dt}
+        server = server(MockAsyncPubSub)
+        client = client('api', origin=self.origin)
+        server.pubsub.send_message(m)
+        result = client.sync_recv()
+        result = json.loads(result)
+        assert result['function'] == function
+        assert result['path'] == path
+        assert result['type'] == type_
+        assert result['data'] == data
+
+    def test_subscribe_invalid_path(self, client, server):
+        server = server(MockAsyncPubSub)
+        client = client(origin=self.origin)
+        path = '/invalid'
+        message = {'function': 'subscribe',
+                   'path': path}
+        message = json.dumps(message)
+        client.sync_send(message)
+        result = client.sync_recv()
+        result = json.loads(result)
+        assert result == {'error': 'Invalid path: {}'.format(path)}
+
+    @pytest.mark.parametrize('message, error', [
+        (json.dumps({'function': 'wrong'}),
+         'Message function must be one of: {}.'.
+         format(', '.join(websocket.WebSocketHandler.functions))),
+        (json.dumps({}), 'Message function must be one of: {}.'.
+         format(', '.join(websocket.WebSocketHandler.functions))),
+        (json.dumps([]), 'Message must be a dict.'),
+        ('not json', 'Message is not json loadable.'),
+        (json.dumps({'function': 'subscribe'}), 'Message missing path.'),
+
+    ])
+    def test_consumer_errors(self, client, server, message, error):
+        server = server(MockAsyncPubSub)
+        client = client(origin=self.origin)
+        client.sync_send(message)
+        result = client.sync_recv()
+        result = json.loads(result)
+        assert result['error'] == error
+
+    def test_init_with_invalid_path(self, client, server):
+        path = '/invalid/path'
+        server = server(MockAsyncPubSub)
+        client = client(path, origin=self.origin)
+        assert not client.open
+        with pytest.raises(websockets.ConnectionClosed) as excinfo:
+            client.sync_ping()
+        exc = excinfo.value
+        assert exc.code == 4004
+        assert exc.reason == 'Invalid path'
+
+    def test_unsubscribe_on_close(self, client, server):
+        server = server(MockAsyncPubSub)
+        client = client(origin=self.origin)
+        server.stop()
+        message = server.pubsub.queue.get_nowait()
+        assert message == {'type': 'unsubscribe', 'channel': b'ALL'}
+
+    def test_listen_empty_message(self, client, server):
+        server = server(MockAsyncPubSub)
+        client = client(origin=self.origin)
+        server.pubsub.send_message(None)
+        with pytest.raises(asyncio.TimeoutError):
+            client.sync_recv(timeout=0.2)
