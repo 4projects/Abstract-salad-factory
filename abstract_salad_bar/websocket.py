@@ -14,24 +14,18 @@ import websockets
 from .config import config, load_config
 
 
-def handler_factory(pubsub_class, pubsub_kwargs=None, *, loop=None):
+def handler_factory(pubsub, *, loop=None):
     """Create a async handler for the websocket server.
 
     This allows for setting the pubsub class (usefull for testing).
     """
     log = logging.getLogger(__name__)
-    if not pubsub_kwargs:  # pragma: no cover
-        pubsub_kwargs = {}
-    pubsub = pubsub_class(**pubsub_kwargs)
 
     async def handler(websocket, path):
         """Async websocket handler."""
         log.debug('Creating new websocket.')
         with WebSocketHandler(websocket, path, pubsub, loop=loop) as self:
             await self.handle()
-
-    # Save the pubsub as a hidden variable used in testing.
-    handler._pubsub = pubsub
 
     return handler
 
@@ -83,7 +77,7 @@ class WebSocketHandler(object):
                 asyncio.ensure_future(
                     self.pubsub.unsubscribe(), loop=self._loop
                 ),
-                0, loop=self._loop
+                None, loop=self._loop
             )
         except Exception as e:  # pragma: no cover
             self.log.exception('Clean-up failed: %s', e)
@@ -256,33 +250,29 @@ def is_valid_app_path(path):
     return False
 
 
-def run():  # pragma: no cover
+def setup(loop):
     load_config()
-    log = logging.getLogger(__name__)
-    loop = asyncio.get_event_loop()
     host = config['websocket']['host'].get()
     port = config['websocket']['port'].get()
-    # Create redis pool
-    redis_pool = aredis.ConnectionPool.from_url(
-        config['redis_uri'].get()
-    )
-    # Test that we can connect to redis. # TODO not working with aredis
-    asyncio.wait_for(
-        asyncio.ensure_future(
-            aredis.StrictRedis(connection_pool=redis_pool).ping(),
-            loop=loop
-        ),
-        0, loop=loop
-    )
-    # Set redis pool as the PubSub class redis pool.
-    handler = handler_factory(PubSub,
-                              {'connection_pool': redis_pool},
-                              loop=loop)
-    server = websockets.serve(handler, host=host, port=port)
+    # Create redis client
+    redis_client = aredis.StrictRedis.from_url(config['redis_uri'].get())
+    # Test that we can connect to redis.
+    redis_test = asyncio.ensure_future(redis_client.ping(), loop=loop)
+    handler = handler_factory(redis_client.pubsub(), loop=loop)
+    server = websockets.serve(handler, host=host, port=port, loop=loop)
 
     loop.run_until_complete(server)
+    # Raises an ConnectionError if we could not connect to the redis server.
+    redis_test.result()
     print('Started Websocket server at {}:{}'.format(host, port))
-    log.debug('started websocket server')
+
+
+def run():  # pragma: no cover
+    log = logging.getLogger(__name__)
+    log.debug('Getting default event loop')
+    loop = asyncio.get_event_loop()
+    setup(loop)
+    log.debug('Running websocket server')
     loop.run_forever()
     loop.stop()
 

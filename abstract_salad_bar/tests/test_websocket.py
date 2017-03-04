@@ -1,8 +1,10 @@
 import asyncio
-from functools import partial
 import json
 import logging
 import re
+from unittest import mock
+
+import aredis
 
 import pytest
 
@@ -149,17 +151,13 @@ class Server:
             self._loop = asyncio.get_event_loop()
         self._running = False
 
-    def start(self, host, port, pubsub_class, **kwargs):
+    def start(self, host, port, pubsub):
         self._running = True
-        pubsub_kwargs = kwargs
-        pubsub_kwargs['loop'] = self._loop
-        print(pubsub_kwargs)
-        handler = websocket.handler_factory(pubsub_class, pubsub_kwargs,
-                                            loop=self._loop)
+        self.pubsub = pubsub
+        handler = websocket.handler_factory(pubsub, loop=self._loop)
         server = websockets.serve(handler, host=host, port=port,
                                   loop=self._loop)
         self.server = self._loop.run_until_complete(server)
-        self.pubsub = handler._pubsub
         return self
 
     def __call__(self, *args, **kwargs):  # pragma: no cover
@@ -184,7 +182,10 @@ class Server:
 @pytest.fixture
 def server(event_loop, unused_tcp_port):
     server = Server(loop=event_loop)
-    yield partial(server.start, 'localhost', unused_tcp_port)
+
+    def get_server(*, pubsub=MockAsyncPubSub(loop=event_loop)):
+        return server.start('localhost', unused_tcp_port, pubsub)
+    yield get_server
     server.stop()
 
 
@@ -237,7 +238,7 @@ class TestWebSocketHandler:
         requests_mocker.get(matcher)
 
     def test_connect(self,  client, server):
-        server = server(MockAsyncPubSub)
+        server = server()
         client = client(origin=self.origin)
         assert client.open
 
@@ -252,7 +253,7 @@ class TestWebSocketHandler:
         'api/path/hello',
     ])
     def test_connect_with_path(self, unused_tcp_port, client, server, path):
-        server = server(MockAsyncPubSub)
+        server = server()
         client = client(path, origin=self.origin)
         assert client.open
 
@@ -264,7 +265,7 @@ class TestWebSocketHandler:
         ('api/nowhere/ws', '/api/nowhere/ws'),
     ])
     def test_subscribe_ls_unsubscribe(self, client, server, path, expected):
-        server = server(MockAsyncPubSub)
+        server = server()
         client = client(origin=self.origin)
         tests = [
             ('subscribe', {'path': expected}),
@@ -298,7 +299,7 @@ class TestWebSocketHandler:
             encode('utf-8')
         m = {'channel': path.encode('utf-8'), 'type': function,
              'data': dt}
-        server = server(MockAsyncPubSub)
+        server = server()
         client = client('api', origin=self.origin)
         server.pubsub.send_message(m)
         result = client.sync_recv()
@@ -309,7 +310,7 @@ class TestWebSocketHandler:
         assert result['data'] == data
 
     def test_subscribe_invalid_path(self, client, server):
-        server = server(MockAsyncPubSub)
+        server = server()
         client = client(origin=self.origin)
         path = '/invalid'
         message = {'function': 'subscribe',
@@ -332,7 +333,7 @@ class TestWebSocketHandler:
 
     ])
     def test_consumer_errors(self, client, server, message, error):
-        server = server(MockAsyncPubSub)
+        server = server()
         client = client(origin=self.origin)
         client.sync_send(message)
         result = client.sync_recv()
@@ -341,7 +342,7 @@ class TestWebSocketHandler:
 
     def test_init_with_invalid_path(self, client, server):
         path = '/invalid/path'
-        server = server(MockAsyncPubSub)
+        server = server()
         client = client(path, origin=self.origin)
         assert not client.open
         with pytest.raises(websockets.ConnectionClosed) as excinfo:
@@ -351,15 +352,37 @@ class TestWebSocketHandler:
         assert exc.reason == 'Invalid path'
 
     def test_unsubscribe_on_close(self, client, server):
-        server = server(MockAsyncPubSub)
+        server = server()
         client = client(origin=self.origin)
         server.stop()
         message = server.pubsub.queue.get_nowait()
         assert message == {'type': 'unsubscribe', 'channel': b'ALL'}
 
     def test_listen_empty_message(self, client, server):
-        server = server(MockAsyncPubSub)
+        server = server()
         client = client(origin=self.origin)
         server.pubsub.send_message(None)
         with pytest.raises(asyncio.TimeoutError):
             client.sync_recv(timeout=0.2)
+
+
+@pytest.mark.xfail(reason='aredis doesn\'t allow for using a different '
+                   'loop from the default.')
+def test_setup(event_loop, config, args, pifpaf_redis, unused_tcp_port):
+    websocket_port = unused_tcp_port
+    redis_port = pifpaf_redis.port
+    config['websocket']['port'] = websocket_port
+    url = 'redis://localhost:{}'.format(redis_port)
+    config['redis_uri'] = url
+    websocket.setup(event_loop)
+
+
+def test_setup_no_redis(event_loop, config, args, unused_tcp_port_factory):
+    websocket_port = unused_tcp_port_factory()
+    redis_port = unused_tcp_port_factory()
+    config['websocket']['port'] = websocket_port
+    url = 'redis://localhost:{}'.format(redis_port)
+    url = 'redis://invalid/url:1'
+    config['redis_uri'] = url
+    with pytest.raises(aredis.ConnectionError):
+        websocket.setup(event_loop)
