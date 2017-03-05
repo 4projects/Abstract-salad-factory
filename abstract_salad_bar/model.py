@@ -8,7 +8,7 @@ import persistent
 import shortuuid
 
 
-def log():
+def log():  # pragma: no cover
     """Logger, is loaded on first use.
 
     Thus we make sure it is loaded after our config is loaded.
@@ -75,9 +75,9 @@ class DocumentCollection(BTree, Resource):
             json.update({
                 'websocket': {
                     '@type': 'url',
-                    '@value': request.link(Websocket(self)).
+                    '@value': request.link(Websocket(self))
                     # Temporary solution, till link_prefix works.
-                    replace('http', 'ws').replace('5000', '8080')
+                    .replace('http', 'ws').replace('5000', '8080')
                 },
             })
         json.update(super().dump_json(request, root))
@@ -112,13 +112,6 @@ class Document(persistent.Persistent, Resource):
             return False
         return True
 
-    @classmethod
-    def load_json(cls, json, request=None):
-        return super(Document, cls).load_json(json, request)
-
-    def dump_json(self, request, root=True):
-        return super().dump_json(request, root)
-
     def _dump_json_attr(self, attribute, request, root):
         # If if children parameter is set and
         # this is the root object return whole attribute, not just a
@@ -135,7 +128,9 @@ class SaladDocument(Document):
 
     def __init__(self, start_time=None, location=None):
         super().__init__()
-        if not start_time:
+        # TODO remove all this, should always have a valid start_time
+        # should be utz set.
+        if not start_time:  # pragma: no cover
             start_time = arrow.get()
             # TODO set to next Thursday 12.30
             if start_time.time() > datetime.time(12, 00):
