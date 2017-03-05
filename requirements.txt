@@ -1,13 +1,17 @@
-arrow
+aredis
+# arrow
 babel
 bowerstatic
 chameleon
+iso8601
 lingua
 morepath
 more.transaction
 pbr
+redis
 scandir; python_version<'3.5'
 shortuuid
 webob
+websockets
 zodb
 zodburi
