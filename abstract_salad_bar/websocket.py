@@ -1,5 +1,5 @@
 import asyncio
-from concurrent.futures import CancelledError
+from asyncio.futures import CancelledError
 import json
 import logging
 from urllib import parse
@@ -49,6 +49,10 @@ class WebSocketHandler(object):
         self.origin = self.websocket.request_headers['origin'] or ''
         self.log.debug('Origin: %r', self.origin)
         self.subscriptions = set()
+        # A lock wich will lock till for ever. Used to have the producer
+        # in waiting state if no message was recieved from redis server.
+        self._lock = self._loop.create_future()
+        self.tasks = []
         # Redis connect, make sure we have a pool.
         self.pubsub = pubsub
         path = path.rstrip('/')
@@ -72,7 +76,13 @@ class WebSocketHandler(object):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        # Clean-up.
         try:
+            # Close lock.
+            self._lock.set_result(None)
+            # Cancel all tasks.
+            [t.cancel() for t in self.tasks]
+            # Unsubscribe to all subscriptions.
             asyncio.wait_for(
                 asyncio.ensure_future(
                     self.pubsub.unsubscribe(), loop=self._loop
@@ -94,29 +104,39 @@ class WebSocketHandler(object):
 
     async def handle(self):
         self.log.debug('handlingen')
-        try:
-            while True:
-                tasks = []
-                tasks.append(asyncio.ensure_future(self.consumer(),
-                                                   loop=self._loop))
-                tasks.append(asyncio.ensure_future(self.producer(),
-                                                   loop=self._loop))
-                # Wait for any of the tasks to be done.
-                done, pending = await asyncio.wait(
-                    tasks,
-                    loop=self._loop,
-                    return_when=asyncio.FIRST_COMPLETED)
-                for task in tasks:
-                    # If they are done or cancelled, cancel() returns False
-                    if not task.cancel():
-                        task.result()
-        finally:
-            for task in tasks:
+        while True:
+            self.tasks.append(asyncio.ensure_future(self.consumer(),
+                                                    loop=self._loop))
+            self.tasks.append(asyncio.ensure_future(self.producer(),
+                                                    loop=self._loop))
+            # Wait for any of the tasks to be done.
+            done, pending = await asyncio.wait(
+                self.tasks,
+                loop=self._loop,
+                return_when=asyncio.FIRST_COMPLETED)
+            self.log.debug('Done tasks: %s.', done)
+            self.log.debug('Pending tasks: %s.', pending)
+            for task in done:
+                try:
+                    func, message = task.result()
+                except CancelledError:
+                    continue
+                self.log.debug('running function %s on message %s',
+                               func, message)
+                await func(message)
+            for task in pending:
                 task.cancel()
+            self.tasks = []
 
     async def consumer(self):
         message = await self.websocket.recv()
         self.log.debug('Got message from client: %s', message)
+        return self._consumer, message
+
+    async def _consumer(self, message):
+        self.log.debug('Running consumer on message %s', message)
+        if not message:
+            return
         try:
             message = json.loads(message)
         except Exception:
@@ -165,6 +185,7 @@ class WebSocketHandler(object):
             self.log.debug('Subscribing to path: %s', path)
             await self.pubsub.subscribe(path)
             self.subscriptions.add(path)
+            # self._subscriber.set_result(None)
         else:
             await self.websocket.send(json.dumps(
                 {'function': 'subscribe',
@@ -184,10 +205,18 @@ class WebSocketHandler(object):
             ))
 
     async def producer(self):
-        r_message = await self.pubsub.listen()
+        message = await self.pubsub.listen()
+        if not message:
+            # Not subscribed yet, just lock till a task is done.
+            await self._lock
+        self.log.debug('Message from redis server: %r', message)
+        return self._producer, message
+
+    async def _producer(self, message):
+        r_message = message
         if not r_message:
             return
-        self.log.debug('Message from redis server: %s', r_message)
+        self.log.debug('Running producer on message %s', message)
         function = r_message['type']
         w_message = {'function': function,
                      'path': r_message['channel'].decode('utf-8')}
@@ -195,7 +224,7 @@ class WebSocketHandler(object):
             data = json.loads(r_message['data'].decode('utf-8'))
             w_message.update({'data': data['data'],
                              'type': data['type']})
-        self.log.debug('Message send over webscoket: %s',
+        self.log.debug('Message send over websocket: %s',
                        w_message)
         await self.websocket.send(json.dumps(w_message))
 
