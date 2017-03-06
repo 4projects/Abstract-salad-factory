@@ -135,8 +135,6 @@ class WebSocketHandler(object):
 
     async def _consumer(self, message):
         self.log.debug('Running consumer on message %s', message)
-        if not message:
-            return
         try:
             message = json.loads(message)
         except Exception:
@@ -214,8 +212,6 @@ class WebSocketHandler(object):
 
     async def _producer(self, message):
         r_message = message
-        if not r_message:
-            return
         self.log.debug('Running producer on message %s', message)
         function = r_message['type']
         w_message = {'function': function,
