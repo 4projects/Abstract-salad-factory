@@ -57,5 +57,5 @@ def run():
               url_scheme=config['url_scheme'].get())
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  #pragma: no cover
     run()
