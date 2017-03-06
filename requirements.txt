@@ -3,6 +3,7 @@ aredis
 babel
 bowerstatic
 chameleon
+confuse
 iso8601
 lingua
 morepath

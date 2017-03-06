@@ -1,5 +1,7 @@
-tox
+pifpaf
 pytest
 pytest-asyncio
 pytest-catchlog
+pytest-cov
 requests-mock
+tox
