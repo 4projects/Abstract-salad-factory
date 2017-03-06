@@ -13,7 +13,7 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "abstract_salad_bar/bower_components/",
+    "asf/bower_components/",
     "test",
     "tests"
   ],

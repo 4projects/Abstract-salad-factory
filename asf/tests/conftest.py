@@ -5,7 +5,7 @@ import pytest
 
 @pytest.fixture()
 def config():
-    from abstract_salad_bar.config import config
+    from asf.config import config
     config.clear()
     config.read(user=False)
     return config

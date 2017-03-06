@@ -24,4 +24,4 @@ __pycache__/
 /docs/_build/
 
 # Ignore locales, explicitly add these
-/abstract_salad_bar/locale
+/asf/locale

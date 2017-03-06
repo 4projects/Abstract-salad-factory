@@ -7,7 +7,7 @@ from . import model
 
 # @app_module.App.view(model=model.Root)
 # def view_root(self, request):
-#     request.include('abstract_salad_bar')
+#     request.include('asf')
 #     return request.get_response(static.FileApp(
 #         module_relative_path('index.html')
 #     ))

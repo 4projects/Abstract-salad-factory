@@ -10,7 +10,7 @@ import pytest
 
 import websockets
 
-from abstract_salad_bar import websocket
+from asf import websocket
 
 
 @pytest.mark.parametrize('path, status_code, result', [

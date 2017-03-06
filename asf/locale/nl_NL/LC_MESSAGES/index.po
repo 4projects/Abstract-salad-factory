@@ -17,19 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-#: ./abstract_salad_bar/template/_locale/index.html:20
+#: ./asf/template/_locale/index.html:20
 msgid "New"
 msgstr "Nieuw"
 
-#: ./abstract_salad_bar/template/_locale/index.html:22
+#: ./asf/template/_locale/index.html:22
 msgid "Change language"
 msgstr "Kies taal"
 
-#: ./abstract_salad_bar/template/_locale/index.html:33
+#: ./asf/template/_locale/index.html:33
 msgid "Help"
 msgstr "Help"
 
-#: ./abstract_salad_bar/template/_locale/index.html:46
+#: ./asf/template/_locale/index.html:46
 msgid "Welcom to the ${ASF} app!"
 msgstr "Welkom bij de ${ASF} app!"
 
@@ -37,7 +37,7 @@ msgstr "Welkom bij de ${ASF} app!"
 #. fun way! Decided the date and location everyone brings salad ingriedents and
 #. you can make your own little salad using any ingredients you want (like a
 #. salad bar, but with firends).
-#: ./abstract_salad_bar/template/_locale/index.html:49
+#: ./asf/template/_locale/index.html:49
 msgid "main help"
 msgstr ""
 "Het idee van ${ASF} is om op een leuke manier een saladedate te "
@@ -51,7 +51,7 @@ msgstr ""
 #. press the create button! You will go to the new event page, this will give
 #. you a link (in the blue box) to share with your friends and allows you to
 #. add ingredients you or other people will bring to the factory.
-#: ./abstract_salad_bar/template/_locale/index.html:52
+#: ./asf/template/_locale/index.html:52
 msgid "create help"
 msgstr ""
 "Op deze pagina is het mogelijk om een ${ASF} evement te maken. Om een "
@@ -64,7 +64,7 @@ msgstr ""
 #. Default: Someone shared a ${ASF} with you! Here you can see the link to
 #. share this Factory with other friends (in the blue box) and the ingredients
 #. people will be bringing and you can add your own.
-#: ./abstract_salad_bar/template/_locale/index.html:55
+#: ./asf/template/_locale/index.html:55
 msgid "salad help"
 msgstr ""
 "Iemand heeft een ${ASF} met je gedeelt! Op deze pagina zie je (in de "
@@ -72,94 +72,94 @@ msgstr ""
 " lijst met ingrediënten die iedereen meeneemt (vergeet niet zelf iets toe"
 " te voegen)."
 
-#: ./abstract_salad_bar/template/_locale/index.html:61
+#: ./asf/template/_locale/index.html:61
 msgid "You can totally use this app for any potluck like event!"
 msgstr ""
 "Je kan deze app natuurlijk ook gebruiken voor andere voedsel deel "
 "evenementen!"
 
-#: ./abstract_salad_bar/template/_locale/index.html:71
+#: ./asf/template/_locale/index.html:71
 msgid "Create an ${ASF}!"
 msgstr "Creëer een ${ASF}!"
 
-#: ./abstract_salad_bar/template/_locale/index.html:77
+#: ./asf/template/_locale/index.html:77
 msgid "When?"
 msgstr "Wanneer"
 
-#: ./abstract_salad_bar/template/_locale/index.html:79
-#: ./abstract_salad_bar/template/_locale/index.html:98
+#: ./asf/template/_locale/index.html:79
+#: ./asf/template/_locale/index.html:98
 msgid "Invalid date."
 msgstr "Ongeldige datum."
 
-#: ./abstract_salad_bar/template/_locale/index.html:81
+#: ./asf/template/_locale/index.html:81
 msgid "Today"
 msgstr "vandaag"
 
-#: ./abstract_salad_bar/template/_locale/index.html:82
+#: ./asf/template/_locale/index.html:82
 msgid "Tomorrow"
 msgstr "morgen"
 
-#: ./abstract_salad_bar/template/_locale/index.html:83
+#: ./asf/template/_locale/index.html:83
 msgid "next Week"
 msgstr "volgende week"
 
-#: ./abstract_salad_bar/template/_locale/index.html:84
+#: ./asf/template/_locale/index.html:84
 msgid "Now"
 msgstr "nu"
 
-#: ./abstract_salad_bar/template/_locale/index.html:89
+#: ./asf/template/_locale/index.html:89
 msgid "at"
 msgstr "om"
 
-#: ./abstract_salad_bar/template/_locale/index.html:91
+#: ./asf/template/_locale/index.html:91
 msgid "Invalid time."
 msgstr "Ongeldige tijd."
 
-#: ./abstract_salad_bar/template/_locale/index.html:93
+#: ./asf/template/_locale/index.html:93
 msgid "Same time"
 msgstr "Zelfde tijd"
 
-#: ./abstract_salad_bar/template/_locale/index.html:99
+#: ./asf/template/_locale/index.html:99
 msgid "${date} at ${time} is in the past!"
 msgstr "${date} om ${time} is in het verleden!"
 
-#: ./abstract_salad_bar/template/_locale/index.html:100
+#: ./asf/template/_locale/index.html:100
 msgid "${ASF} starts ${date} at ${time}."
 msgstr "${ASF} begint ${date} om ${time}."
 
-#: ./abstract_salad_bar/template/_locale/index.html:104
+#: ./asf/template/_locale/index.html:104
 msgid "Where?"
 msgstr "Waar?"
 
-#: ./abstract_salad_bar/template/_locale/index.html:105
+#: ./asf/template/_locale/index.html:105
 msgid "Somewhere"
 msgstr "Ergens"
 
-#: ./abstract_salad_bar/template/_locale/index.html:108
+#: ./asf/template/_locale/index.html:108
 msgid "Create!"
 msgstr "Creëer!"
 
-#: ./abstract_salad_bar/template/_locale/index.html:116
+#: ./asf/template/_locale/index.html:116
 msgid "Share this ${ASF} with your friends:"
 msgstr "Deel deze ${ASF} met je vrienden:"
 
-#: ./abstract_salad_bar/template/_locale/index.html:120
+#: ./asf/template/_locale/index.html:120
 msgid "Starts ${date} at ${time}."
 msgstr "Begint ${date} om ${time}."
 
-#: ./abstract_salad_bar/template/_locale/index.html:127
+#: ./asf/template/_locale/index.html:127
 msgid "Ingredients"
 msgstr "Ingrediënten"
 
-#: ./abstract_salad_bar/template/_locale/index.html:131
+#: ./asf/template/_locale/index.html:131
 msgid "What?"
 msgstr "Wat?"
 
-#: ./abstract_salad_bar/template/_locale/index.html:132
+#: ./asf/template/_locale/index.html:132
 msgid "Who?"
 msgstr "Wie?"
 
-#: ./abstract_salad_bar/template/_locale/index.html:140
+#: ./asf/template/_locale/index.html:140
 msgid "+"
 msgstr "+"
 

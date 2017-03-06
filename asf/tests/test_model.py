@@ -4,7 +4,7 @@ from unittest import mock
 import iso8601
 import pytest
 
-from abstract_salad_bar import model
+from asf import model
 
 
 class MockRequest(mock.MagicMock):

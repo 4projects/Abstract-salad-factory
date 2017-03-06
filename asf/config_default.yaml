@@ -22,7 +22,7 @@ log:
             formatter: simple
             stream: ext://sys.stdout
     loggers:
-        abstract_salad_bar:
+        asf:
             level: DEBUG
     root:
         handlers: [console]
