@@ -22,7 +22,7 @@ def requests_mocker():
 def pifpaf_redis():
     try:
         from pifpaf.drivers.redis import RedisDriver
-    except ImportError:
+    except ImportError:  # pragma: no cover
         pytest.skip('Failed to load pifpaf redis driver.')
     # Set pifpaf log to at INFO, as it is very spammy at DEBUG.
     from pifpaf.drivers import LOG
