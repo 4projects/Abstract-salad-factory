@@ -1,10 +1,14 @@
 """The abstract salad bar model."""
-import datetime
 import logging
 
-import arrow
 from BTrees.OOBTree import BTree
+
+from dateutil import tz
+
+import iso8601
+
 import persistent
+
 import shortuuid
 
 
@@ -126,18 +130,11 @@ class Document(persistent.Persistent, Resource):
 class SaladDocument(Document):
     """The salad."""
 
-    def __init__(self, start_time=None, location=None):
+    def __init__(self, start_time, location=None):
         super().__init__()
-        # TODO remove all this, should always have a valid start_time
-        # should be utz set.
-        if not start_time:  # pragma: no cover
-            start_time = arrow.get()
-            # TODO set to next Thursday 12.30
-            if start_time.time() > datetime.time(12, 00):
-                start_time = start_time.shift(days=1)
-            start_time = start_time.replace(hour=12).floor('hour')
-        # TODO make sure it is iso formated
-        self.start_time = arrow.get(start_time)
+        if start_time.tzinfo is None:
+            raise ValueError('Missing timezone data on start_time.')
+        self.start_time = start_time.astimezone(tz.tzutc())
         self.location = location
         self.ingredients = IngredientCollection(self)
         self.comments = CommentCollection(self)
@@ -150,19 +147,22 @@ class SaladDocument(Document):
         if not super().is_valid_json(json):
             return False
         date = json.get('startDate')
-        if date:
-            try:
-                # Don't like this for validation, how could I improve this?
-                arrow.get(date)
-            except RuntimeError:
-                log.debug('Could not parse date')
-                return False
+        try:
+            date = iso8601.parse_date(date, default_timezone=None)
+        except iso8601.ParseError as e:
+            log.debug('Could not parse date: %s.', e)
+            return False
+        if date.tzinfo is None:
+            log.debug('startDate is missing timezone.')
+            return False
         return True
 
     @classmethod
     def load_json(cls, json, request=None):
         if cls.is_valid_json(json):
-            return cls(start_time=json.get('startDate'),
+            start_time = iso8601.parse_date(json['startDate'],
+                                            default_timezone=None)
+            return cls(start_time=start_time,
                        location=json.get('location', '').strip() or None)
         return super(SaladDocument, cls).load_json(json, request)
 

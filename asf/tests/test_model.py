@@ -1,7 +1,11 @@
+import datetime
 from functools import partial
 from unittest import mock
 
+from dateutil import tz
+
 import iso8601
+
 import pytest
 
 from asf import model
@@ -133,42 +137,48 @@ class TestDocument(TestResource):
 class TestSaladDocument(TestDocument):
     resource_class = model.SaladDocument
 
+    @property
+    def resource(self):
+        return partial(self.resource_class,
+                       datetime.datetime.now(tz.tzutc()))
+
     @pytest.mark.parametrize('json, valid', [
         ({}, False),
-        ({'@type': 'FoodEvent'}, True),
-        ({'type': 'FoodEvent', 'startDate': ''}, True),
+        ({'@type': 'FoodEvent'}, False),
+        ({'type': 'FoodEvent', 'startDate': ''}, False),
         ({'type': 'FoodEvent', 'startDate': 'hello'}, False),
-        pytest.mark.xfail(
-            ({'type': 'FoodEvent',
-              'startDate': '2017-03-04T17:26'}, False),  # Missing timezone.
-            reason='Checking if timezone is set is not tested yet.'),
+        ({'type': 'FoodEvent',
+          'startDate': '2017-03-04T17:26'}, False),  # Missing timezone.
         ({'type': 'FoodEvent', 'startDate': '2017-03-04T17:26-05:00'}, True),
         ({'type': 'FoodEvent',
-          'startDate': '2017-03-04T17:26:00EST'}, True),
+          'startDate': '2017-03-04 17:26:00-05:00'}, True),
         ({'type': 'FoodEvent',
-          'startDate': '2017-03-04 17:26:00EST'}, True),
+          'startDate': '2017-03-04 17:26:00.000000-05:00'}, True),
         ({'type': 'FoodEvent',
-          'startDate': '2017-03-04 17:26:00.000000EST'}, True),
-        pytest.mark.xfail(
-            ({'type': 'FoodEvent',
-              'startDate': '2017-03-04 17:26-05:00.000000EST'}, False)
-        ),
+          'startDate': '2017-03-04 17:26-05:00.000000'}, False),
         ({'type': 'FoodEvent',
-          'startDate': '2017-03-04 17:26:00.000000EST',
+          'startDate': '2017-03-04 17:26:00.000000-05:00',
           'location': 'Somewhere'}, True),
     ])
     def test_is_valid_json(self, json, valid):
         assert self.resource_class.is_valid_json(json) is valid
 
     @pytest.mark.parametrize('json, result', [
-        ({}, {'location': None}),
         ({'startDate': '2017-03-04T17:26-05:00'},
          {'start_time': iso8601.parse_date('2017-03-04T17:26:00-05:00'),
           'location': None}),
-        ({'location': 'somewhere'}, {'location': 'somewhere'}),
-        ({'location': 'somewhere   '}, {'location': 'somewhere'}),
-        ({'location': ''}, {'location': None}),
-        ({'location': '  '}, {'location': None}),
+        ({'startDate': '2017-03-04T17:26-05:00'},
+         {'start_time': datetime.datetime(2017, 3, 4, 22, 26,
+                                          tzinfo=tz.tzutc()),
+          'location': None}),
+        ({'startDate': '2017-03-04T17:26-05:00',
+          'location': 'somewhere'}, {'location': 'somewhere'}),
+        ({'startDate': '2017-03-04T17:26-05:00',
+          'location': 'somewhere   '}, {'location': 'somewhere'}),
+        ({'startDate': '2017-03-04T17:26-05:00',
+          'location': ''}, {'location': None}),
+        ({'startDate': '2017-03-04T17:26-05:00',
+          'location': '  '}, {'location': None}),
     ])
     def test_load_json(self, json, result):
         json.update({'@type': self.resource_class.schema_type})
@@ -176,6 +186,13 @@ class TestSaladDocument(TestDocument):
         assert isinstance(obj, self.resource_class)
         for attr, val in result.items():
             assert getattr(obj, attr) == val
+
+    @pytest.mark.parametrize('date', [
+        datetime.datetime.now(),
+    ])
+    def test_init_fail(self, date):
+        with pytest.raises(ValueError):
+            self.resource_class(date)
 
     def test_dump_json(self):
         resource = self.resource()
