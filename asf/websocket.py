@@ -276,6 +276,7 @@ def is_valid_app_path(path):
 
 
 def setup(loop):
+    log = logging.getLogger(__name__)
     load_config()
     host = config['websocket']['host'].get()
     port = config['websocket']['port'].get()
@@ -286,9 +287,21 @@ def setup(loop):
     handler = handler_factory(redis_client.pubsub(), loop=loop)
     server = websockets.serve(handler, host=host, port=port, loop=loop)
 
-    loop.run_until_complete(server)
+    futures = asyncio.wait(
+        [server, redis_test],
+        loop=loop,
+        timeout=1
+    )
+    loop.run_until_complete(futures)
     # Raises an ConnectionError if we could not connect to the redis server.
-    redis_test.result()
+    try:
+        redis_test.result()
+    except (aredis.ConnectionError, asyncio.futures.InvalidStateError) as exc:
+        redis_test.cancel()
+        if isinstance(exc, aredis.ConnectionError):
+            raise
+        # TODO Replace with our own exception!
+        raise aredis.ConnectionError('Could not connect to redis server.')
     print('Started Websocket server at {}:{}'.format(host, port))
 
 

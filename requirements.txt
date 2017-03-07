@@ -1,5 +1,4 @@
 aredis
-# arrow
 babel
 bowerstatic
 chameleon
@@ -9,6 +8,7 @@ lingua
 morepath
 more.transaction
 pbr
+python-dateutil
 redis
 scandir; python_version<'3.5'
 shortuuid
