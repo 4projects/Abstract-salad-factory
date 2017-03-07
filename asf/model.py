@@ -193,16 +193,34 @@ class IngredientDocument(Document):
         if not super().is_valid_json(json):
             return False
         # The name and seller values must be filled.
-        for name in ('name', 'seller'):
-            if not json.get(name, '').strip():
+        for name, type_ in (('name', 'Product'), ('seller', 'Person')):
+            if not name in json:
+                return False
+            value = json.get(name)
+            if isinstance(value, str):
+                if not value.strip():
+                    return False
+            elif hasattr(value, 'get'):
+                json_type = value.get('@type', value.get('type', type_))
+                if json_type.lower() != type_.lower():
+                    return False
+                if not value.get('name', '').strip():
+                    return False
+            else:
                 return False
         return True
 
     @classmethod
     def load_json(cls, json, request=None):
         if cls.is_valid_json(json):
-            return cls(name=json['name'].strip(),
-                       owner=json['seller'].strip())
+            name = json['name']
+            if not isinstance(name, str):
+                name = name['name']
+            owner = json['seller']
+            if not isinstance(owner, str):
+                owner = owner['name']
+            return cls(name=name.strip(),
+                       owner=owner.strip())
         return super(IngredientDocument, cls).load_json(json, request)
 
     def dump_json(self, request, root=True):

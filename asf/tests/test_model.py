@@ -241,42 +241,27 @@ class TestIngredientDocument(TestDocument):
         ({'type': 'Offer', 'name': '  ', 'seller': 'me'}, False),
         ({'type': 'Offer', 'name': 'lettuce', 'seller': '  '}, False),
         ({'type': 'Offer', 'name': 'lettuce', 'seller': 'me'}, True),
-        # These are not working yet, have to implemment dict parsing.
-        pytest.mark.xfail(
-            ({'type': 'Offer', 'name': {}, 'seller': {}}, False)
-        ),
-        pytest.mark.xfail(
-            ({'type': 'Offer', 'name': {'name': ''}, 'seller': 'me'}, False),
-        ),
-        pytest.mark.xfail(
-            ({'type': 'Offer', 'name': {'name': 'lettuce'},
-              'seller': 'me'}, True),
-        ),
-        pytest.mark.xfail(
-            ({'type': 'Offer', 'name': {'type': 'Product',
-                                        'name': 'lettuce'},
-              'seller': 'me'}, True),
-        ),
-        pytest.mark.xfail(
-            ({'type': 'Offer', 'name': {'@type': 'Product',
-                                        'name': 'lettuce'},
-              'seller': 'me'}, True),
-        ),
-        pytest.mark.xfail(
-            ({'type': 'Offer', 'name': {'@type': 'Person',
-                                        'name': 'lettuce'},
-              'seller': 'me'}, False),
-        ),
-        pytest.mark.xfail(
-            ({'type': 'Offer', 'name': {'@type': 'Product',
-                                        'name': ''},
-              'seller': 'me'}, False),
-        ),
-        pytest.mark.xfail(
-            ({'type': 'Offer', 'name': 'lettuce',
-              'seller': {'type': 'Person',
-                         'name': 'me'}}, True),
-        ),
+        ({'type': 'Offer', 'name': {}, 'seller': {}}, False),
+        ({'type': 'Offer', 'name': {'name': ''}, 'seller': 'me'}, False),
+        ({'type': 'Offer', 'name': {'name': 'lettuce'},
+          'seller': 'me'}, True),
+        ({'type': 'Offer', 'name': {'type': 'Product',
+                                    'name': 'lettuce'},
+          'seller': 'me'}, True),
+        ({'type': 'Offer', 'name': {'@type': 'Product',
+                                    'name': 'lettuce'},
+          'seller': 'me'}, True),
+        ({'type': 'Offer', 'name': {'@type': 'Person',
+                                    'name': 'lettuce'},
+          'seller': 'me'}, False),
+        ({'type': 'Offer', 'name': {'@type': 'Product',
+                                    'name': ''},
+          'seller': 'me'}, False),
+        ({'type': 'Offer', 'name': [],
+          'seller': 'me'}, False),
+        ({'type': 'Offer', 'name': 'lettuce',
+          'seller': {'type': 'Person',
+                     'name': 'me'}}, True),
     ])
     def test_is_valid_json(self, json, valid):
         assert self.resource_class.is_valid_json(json) is valid
@@ -286,10 +271,8 @@ class TestIngredientDocument(TestDocument):
          {'name': 'lettuce', 'owner': 'me'}),
         ({'name': 'lettuce  ', 'seller': 'me  '},
          {'name': 'lettuce', 'owner': 'me'}),
-        pytest.mark.xfail(
-            ({'name': {'name': 'lettuce  '}, 'seller': {'name': 'me  '}},
-             {'name': 'lettuce', 'owner': 'me'}),
-        ),
+        ({'name': {'name': 'lettuce  '}, 'seller': {'name': 'me  '}},
+         {'name': 'lettuce', 'owner': 'me'}),
     ])
     def test_load_json(self, json, result):
         json.update({'@type': self.resource_class.schema_type})
