@@ -144,6 +144,7 @@ function loadApp() {
     extendDatalists();
     saveEmptySalad();
     setNav();
+    setCreateEvents();
     if (currentState) {
         getSalad(currentState)
     } else {
@@ -271,15 +272,21 @@ function showCreate() {
     showFirstTimeHelp();
 }
 
-function resetCreateSaladForm() {
+function setCreateEvents() {
     var form = $("#createSalad");
-    hideElement(form.find(".help-block"));
-    form[0].reset();
-    form.submit(postSalad);
     var whenInput = form.find("input[name=when]");
     var atInput = form.find("input[name=at]");
     whenInput.on("input", setStartDate)
     atInput.on("input", setStartDate)
+    form.submit(postSalad);
+}
+
+function resetCreateSaladForm() {
+    var form = $("#createSalad");
+    hideElement(form.find(".help-block"));
+    form[0].reset();
+    var whenInput = form.find("input[name=when]");
+    var atInput = form.find("input[name=at]");
     var date = moment().tz(timezone).
         day(4).
         hours(12).minutes(30).
