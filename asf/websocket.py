@@ -214,10 +214,18 @@ class WebSocketHandler(object):
         r_message = message
         self.log.debug('Running producer on message %s', message)
         function = r_message['type']
+        if isinstance(function, bytes):
+            function = function.decode('utf-8')
+        path = r_message['channel']
+        if isinstance(path, bytes):
+            path = path.decode('utf-8')
         w_message = {'function': function,
-                     'path': r_message['channel'].decode('utf-8')}
+                     'path': path}
         if function == 'message':
-            data = json.loads(r_message['data'].decode('utf-8'))
+            data = r_message['data']
+            if isinstance(data, bytes):
+                data = data.decode('utf-8')
+            data = json.loads(data)
             w_message.update({'data': data['data'],
                              'type': data['type']})
         self.log.debug('Message send over websocket: %s',
