@@ -10,6 +10,7 @@ more.transaction
 pbr
 python-dateutil
 redis
+requests
 scandir; python_version<'3.5'
 shortuuid
 waitress
