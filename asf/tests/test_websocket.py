@@ -366,8 +366,6 @@ class TestWebSocketHandler:
             client.sync_recv(timeout=0.2)
 
 
-@pytest.mark.xfail(reason='aredis doesn\'t allow for using a different '
-                   'loop from the default.')
 def test_setup(event_loop, config, args, pifpaf_redis, unused_tcp_port):
     websocket_port = unused_tcp_port
     redis_port = pifpaf_redis.port
