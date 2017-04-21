@@ -12,6 +12,7 @@ python-dateutil
 redis
 scandir; python_version<'3.5'
 shortuuid
+waitress
 webob
 websockets
 zodb
